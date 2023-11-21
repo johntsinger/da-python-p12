@@ -2,12 +2,12 @@ from django.apps import AppConfig
 from django.db.models.signals import post_migrate
 
 
-class CrmConfig(AppConfig):
+class OrmConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'crm'
+    name = 'orm'
 
     def ready(self):
-        from crm.signals import (
+        from orm.signals import (
             create_department_group,
             set_base_permissions
         )

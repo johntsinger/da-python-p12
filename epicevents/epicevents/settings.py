@@ -19,14 +19,36 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django_extensions',
     'guardian',
-    'crm.apps.CrmConfig'
+    'orm.apps.OrmConfig'
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
-AUTH_USER_MODEL = 'crm.User'
+AUTH_USER_MODEL = 'orm.User'
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'guardian.backends.ObjectPermissionBackend',
 )
+
+PERMISSIONS = {
+    'all': [
+        'view_client',
+        'view_contract',
+        'view_event',
+        'view_user'
+    ],
+    'management': [
+        'add_user',
+        'change_user',
+        'delete_user',
+        'add_contract',
+        'change_contract',
+        'change_event',
+    ],
+    'sales': [
+        'add_client',
+        'add_event',
+    ],
+    'support': []
+}
