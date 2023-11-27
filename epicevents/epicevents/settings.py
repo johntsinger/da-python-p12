@@ -1,10 +1,19 @@
 from pathlib import Path
+from dotenv import load_dotenv
+import os
+from epicevents.init_crm import generate_secret_key
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'de@n)4-y$0kj#bq4aww^ad$py9@@a^n@wjv_@*1x95(sythg8q'
+# load environment variables
+load_dotenv()
+
+SECRET_KEY = os.environ.get('SECRET_KEY')
+
+if not SECRET_KEY:
+    generate_secret_key(BASE_DIR)
 
 DATABASES = {
     'default': {
@@ -16,10 +25,10 @@ DATABASES = {
 INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
     'django_extensions',
     'guardian',
-    'orm.apps.OrmConfig'
+    'orm.apps.OrmConfig',
+    'cli.apps.CliConfig'
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
@@ -30,6 +39,9 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'guardian.backends.ObjectPermissionBackend',
 )
+
+# Guardian anonymous user
+ANONYMOUS_USER_NAME = None
 
 PERMISSIONS = {
     'all': [
