@@ -8,6 +8,21 @@ from cli.utils.console import console
 User = get_user_model()
 
 
+def permission_callback(ctx: typer.Context):
+    command_name = ctx.info_name
+    subcommand = ctx.invoked_subcommand
+
+    if command_name == 'collaborator':
+        command_name = 'user'
+    user = get_user()
+    if not user:
+        console.print('[red]Token has expired. Please log in again.')
+        exit()
+    if not user.has_perm(f'orm.{subcommand}_{command_name}'):
+        console.print('[red]You are not allowed.')
+        exit()
+
+
 def get_user():
     try:
         token = Token().decode
@@ -25,8 +40,3 @@ def get_user():
         first_name=first_name,
         last_name=last_name
     )
-
-
-def token_expired():
-    console.print('[red]Token has expired. Please log in again.')
-    raise typer.Exit(code=1)

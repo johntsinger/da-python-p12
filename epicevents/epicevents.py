@@ -6,14 +6,19 @@ from cli.commands import (
     contract,
     event
 )
+from cli.utils.user import permission_callback
 
 
 app = typer.Typer()
 app.add_typer(login.app, name='login')
-app.add_typer(collaborator.app, name='collaborator')
-app.add_typer(client.app, name='client')
-app.add_typer(contract.app, name='contract')
-app.add_typer(event.app, name='event')
+app.add_typer(
+    collaborator.app,
+    name='collaborator',
+    callback=permission_callback
+)
+app.add_typer(client.app, name='client', callback=permission_callback)
+app.add_typer(contract.app, name='contract', callback=permission_callback)
+app.add_typer(event.app, name='event', callback=permission_callback)
 
 
 if __name__ == '__main__':
