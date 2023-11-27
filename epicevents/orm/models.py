@@ -6,6 +6,18 @@ from django.contrib.auth.models import Group
 
 
 class MyUserManager(BaseUserManager):
+    def _create_user(self, email, password=None, **fields):
+        if not email:
+            raise ValueError('User must have an email address')
+
+        user = self.model(
+            email=self.normalize_email(email),
+            **fields
+        )
+        user.set_password(password)
+        user.save(using=self._db)  # using default db
+        return user
+
     def create_user(
         self,
         email,
@@ -15,9 +27,16 @@ class MyUserManager(BaseUserManager):
         department_name,
         password=None
     ):
-        group = Group.objects.get(name=department_name)
+        if not first_name:
+            raise ValueError('User must have a first name')
+        if not last_name:
+            raise ValueError('User must have a last name')
+        if not phone:
+            raise ValueError('User must have a phone number')
+        if not department_name:
+            raise ValueError('User must have a department')
         # self.model reference to this model (create_user)
-        user = self.model(
+        user = self._create_user(
             email=self.normalize_email(email),
             first_name=first_name,
             last_name=last_name,
@@ -25,6 +44,7 @@ class MyUserManager(BaseUserManager):
         )
         user.set_password(password)
         user.save(using=self._db)  # using default db
+        group = Group.objects.get(name=department_name)
         user.groups.add(group)
 
         return user
@@ -32,18 +52,12 @@ class MyUserManager(BaseUserManager):
     def create_superuser(
         self,
         email,
-        first_name,
-        last_name,
-        phone,
-        department,
         password=None
     ):
-        user = self.create_user(
+        if not password:
+            raise ValueError('SuperUser must have a password')
+        user = self._create_user(
             email=email,
-            first_name=first_name,
-            last_name=last_name,
-            phone=phone,
-            department=department,
             password=password,
         )
         user.is_admin = True
@@ -65,12 +79,7 @@ class User(AbstractUser):
     objects = MyUserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = [
-        'first_name',
-        'last_name',
-        'phone',
-        'group'
-    ]
+    REQUIRED_FIELDS = []
 
     def __str__(self):
         return self.get_full_name()
@@ -101,8 +110,8 @@ class ClientManager(models.Manager):
             last_name=last_name,
             email=email,
             phone=phone,
-            contact_id=contact.id,
-            compagny_id=compagny.id,
+            contact=contact,
+            compagny=compagny,
         )
         client.save(using=self._db)
         return client
@@ -143,9 +152,8 @@ class Contract(models.Model):
     )
     price = models.FloatField()
     balance = models.FloatField()
-    status = models.BooleanField(
+    signed = models.BooleanField(
         default=False,
-        verbose_name='Signed'
     )
     created = models.DateField(auto_now_add=True)
     updated = models.DateField(auto_now=True)
