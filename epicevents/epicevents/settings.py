@@ -28,7 +28,6 @@ INSTALLED_APPS = [
     'django_extensions',
     'guardian',
     'orm.apps.OrmConfig',
-    'cli.apps.CliConfig'
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
