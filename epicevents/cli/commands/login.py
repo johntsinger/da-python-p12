@@ -3,7 +3,7 @@ from typing_extensions import Annotated
 from datetime import datetime, timedelta, timezone
 from django.contrib.auth import authenticate
 from cli.utils.console import console
-from cli.utils.validators import validate_callback
+from cli.utils.callbacks import validate_callback
 from cli.utils.token import NewToken
 
 
@@ -39,7 +39,7 @@ def login(
             'user_id': user.id,
             'sub': user.get_full_name(),
             'iss': 'epicevents_crm',
-            'exp': datetime.now(tz=timezone.utc) + timedelta(minutes=5)
+            'exp': datetime.now(tz=timezone.utc) + timedelta(hours=12)
         }
         NewToken(payload)
         console.print('[green]Successfully logged in')
