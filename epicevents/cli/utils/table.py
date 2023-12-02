@@ -61,8 +61,17 @@ def get_type(obj):
     return obj._meta.model.__name__
 
 
-def create_table(queryset):
-    obj = queryset.first()
+def get_model(obj):
+    return obj._meta.model
+
+
+def create_table(queryset_or_obj):
+    try:
+        obj = queryset_or_obj.first()
+        queryset = queryset_or_obj
+    except AttributeError:
+        obj = queryset_or_obj
+        queryset = get_model(obj).objects.filter(id=obj.id)
     if not obj:
         return Table()
     type_obj = get_type(obj)
@@ -78,6 +87,8 @@ def table_add_column(table, type_obj):
         if '__first_name' in field_name:
             previous_field = field_name
             continue
+        elif field_name == 'groups__name':
+            field_name = 'department'
         if previous_field:
             field_name = f"{field_name.split('__')[-2]} name"
             previous_field = None
