@@ -5,7 +5,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from guardian.shortcuts import assign_perm, remove_perm
 from orm.models import Event, Contract
 from cli.utils.console import console
-from cli.utils.callbacks import validate_callback
+from cli.utils.callbacks import (
+    validate_callback,
+    allow_management,
+    allow_support
+)
 from cli.utils.table import create_table
 from cli.utils.prompt import prompt_for
 from cli.utils.user import get_user
@@ -13,13 +17,62 @@ from cli.utils.user import get_user
 
 app = typer.Typer()
 
+user = get_user()
+
+
+def management():
+    """Display options for management department"""
+    if user.is_superuser or user.groups.first().name == 'management':
+        return False
+    return True
+
+
+def support():
+    """Display options for support department"""
+    if user.is_superuser or user.groups.first().name == 'support':
+        return False
+    return True
+
 
 @app.command()
-def view():
+def view(
+    ctx: typer.Context,
+    no_contact: Annotated[
+        bool,
+        typer.Option(
+            "--no-contact",
+            "-n",
+            help="Filter event with no contact (support department)",
+            callback=allow_management,
+            hidden=management()
+        )
+    ] = False,
+    assigned: Annotated[
+        bool,
+        typer.Option(
+            "--assigned",
+            "-a",
+            help="Filter event assigned to me",
+            callback=allow_support,
+            hidden=support()
+        )
+    ] = False,
+):
     """
     View list of all events.
     """
-    queryset = Event.objects.all()
+    querydict = {}
+    for key, value in ctx.params.items():
+        if value:
+            if key == 'no_contact':
+                querydict['contact'] = None
+            elif key == 'assigned':
+                querydict['contact'] = user
+    if querydict:
+        queryset = Event.objects.filter(**querydict)
+    else:
+        queryset = Event.objects.all()
+
     table = create_table(queryset)
     if table.columns:
         console.print(table)
@@ -211,7 +264,6 @@ def change(
         console.print("[red]Event not found.")
         raise typer.Exit()
 
-    user = get_user()
     if (
         user.groups.first().name != 'management'
         and not user.has_perm('change_event', event)
