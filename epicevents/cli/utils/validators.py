@@ -64,6 +64,11 @@ def validate_contract(value, ctx):
         raise ValidationError(
             "Contract not found"
         )
+    if not contract.client.contact == ctx.user:
+        console.print(
+            "Error: [red]You are not the contact of this client's contract"
+        )
+        raise typer.Exit()
     if not contract.signed:
         console.print("Error: [red]This contract has not yet been signed")
         raise typer.Exit()
