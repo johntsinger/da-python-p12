@@ -5,6 +5,7 @@ from cli.utils.validators import validate
 
 
 def permissions_callback(ctx: typer.Context):
+    """Callback to check general permissions"""
     command_name = ctx.info_name
     subcommand = ctx.invoked_subcommand
 
@@ -21,11 +22,14 @@ def permissions_callback(ctx: typer.Context):
 
 def validate_callback(
     ctx: typer.Context,
-    param: typer.CallbackParam,
+    params: typer.CallbackParam,
     value: str
 ):
+    """Callback to validate value in typer.Option"""
+
     # callback called twice inside typer.Option
-    value, error = validate(param.name, value, ctx=ctx)
+    # need model __str__ to validate second attempt
+    value, error = validate(params.name, value, ctx=ctx)
     if error:
         raise typer.BadParameter(
             typer.style(error, fg=typer.colors.RED)
