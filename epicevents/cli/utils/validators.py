@@ -5,12 +5,13 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db.models import Value as V
 from django.db.models.functions import Concat
 from django.contrib.auth.models import Group
-from orm.models import User, Client, Compagny
+from orm.models import User, Client, Compagny, Contract, Event
 from orm.normalizers import normalize_phone, normalize_email
 from cli.utils.console import console
 
 
 def validate_value(validator_name, value, ctx):
+    """Validate value when prompting outside of typer.Option"""
     value, error = validate(validator_name, value, ctx)
     if error:
         console.print(f'Error: [red]{error}')
@@ -19,6 +20,7 @@ def validate_value(validator_name, value, ctx):
 
 
 def validate(validator_name, value, ctx):
+    """Validator manager"""
     try:
         value = VALIDATORS[validator_name](value, ctx)
     except KeyError:
@@ -28,19 +30,70 @@ def validate(validator_name, value, ctx):
     return value, None
 
 
-def validate_unique(key, value):
+def validate_unique_email(value):
     if (
-        User.objects.filter(**{key: value}).exists()
-        or Client.objects.filter(**{key: value}).exists()
+        User.objects.filter(email=value).exists()
+        or Client.objects.filter(email=value).exists()
     ):
         raise ValidationError(
-            f"This {key} is already exists"
+            f"This email is already exists"
         )
+
+
+def validate_unique_phone(value):
+    if (
+        User.objects.filter(phone=value).exists()
+        or Client.objects.filter(phone=value).exists()
+    ):
+        raise ValidationError(
+            f"This phone is already exists"
+        )
+
+
+def validate_unique_contract(value):
+    if Event.objects.filter(contract=value).exists():
+        raise ValidationError(
+            'Event with this Contract already exists.'
+        )
+
+
+def validate_contract(value, ctx):
+    try:
+        contract = Contract.objects.get(id=value)
+    except ObjectDoesNotExist:
+        raise ValidationError(
+            "Contract not found"
+        )
+    if not contract.signed:
+        console.print("Error: [red]This contract has not yet been signed")
+        raise typer.Exit()
+    validate_unique_contract(contract)
+    return contract
+
+
+def validate_client(value, ctx):
+    try:
+        client = Client.objects.annotate(
+            full_name=Concat(
+                'first_name',
+                V(' '),
+                'last_name'
+            )
+        ).get(
+            full_name=value
+        )
+    except ObjectDoesNotExist:
+        raise ValidationError(
+            "Client not found"
+        )
+    return client
 
 
 def validate_contact(value, ctx):
     if ctx.parent.info_name == 'client':
         group = 'sales'
+    elif ctx.parent.info_name == 'event':
+        group = 'support'
     try:
         contact = User.objects.annotate(
             full_name=Concat(
@@ -82,7 +135,7 @@ def validate_email(value, ctx):
     email_validator(value)
     value = normalize_email(value)
     if ctx.info_name != 'login':
-        validate_unique('email', value)
+        validate_unique_email(value)
     return value
 
 
@@ -93,7 +146,7 @@ def validate_phone(value, ctx):
             f"Enter a valid phone number"
         )
     value = normalize_phone(value)
-    validate_unique('phone', value)
+    validate_unique_phone(value)
     return value
 
 
@@ -113,5 +166,7 @@ VALIDATORS = {
     'department': validate_department,
     'password': validate_password,
     'contact': validate_contact,
-    'compagny': validate_compagny
+    'compagny': validate_compagny,
+    'client': validate_client,
+    'contract': validate_contract
 }
