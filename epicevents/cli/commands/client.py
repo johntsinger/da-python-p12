@@ -78,6 +78,7 @@ def add(
 ):
     """
     Create a new client.
+    Options are prompted if omitted.
     """
     if not user:
         console.print('[red]Token has expired. Please log in again.')

@@ -87,6 +87,7 @@ def add(
 ):
     """
     Create a new collaborator.
+    Options are prompted if omitted.
     """
     new_user = User.objects.create_user(
         first_name=first_name,

@@ -22,6 +22,8 @@ user = get_user()
 
 def management():
     """Display options for management department"""
+    if not user:
+        return True
     if user.is_superuser or user.groups.first().name == 'management':
         return False
     return True
@@ -29,6 +31,8 @@ def management():
 
 def support():
     """Display options for support department"""
+    if not user:
+        return True
     if user.is_superuser or user.groups.first().name == 'support':
         return False
     return True
@@ -158,6 +162,7 @@ def add(
 ):
     """
     Create a new event.
+    Options are prompted if omitted.
     """
     new_event = Event.objects.create(
         name=name,

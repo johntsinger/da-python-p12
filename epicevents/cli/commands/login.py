@@ -33,6 +33,7 @@ def login(
         )
     ]
 ):
+    """Login."""
     user = authenticate(username=email, password=password)
     if user is not None:
         payload = {

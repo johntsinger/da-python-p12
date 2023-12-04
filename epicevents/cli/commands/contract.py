@@ -18,6 +18,8 @@ user = get_user()
 
 def sales():
     """Display options for sales department"""
+    if not user:
+        return True
     if user.is_superuser or user.groups.first().name == 'sales':
         return False
     return True
@@ -140,6 +142,7 @@ def add(
 ):
     """
     Create a new contract.
+    Options are prompted if omitted.
     """
     if not user:
         console.print('[red]Token has expired. Please log in again.')
