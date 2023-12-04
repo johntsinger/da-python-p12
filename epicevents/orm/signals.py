@@ -24,7 +24,3 @@ def set_base_permissions(sender, **kwargs):
             assign_perm('orm.' + codename, group)
         for codename in settings.PERMISSIONS['all']:
             assign_perm('orm.' + codename, group)
-
-
-def set_objects_permissions(sender, **kwargs):
-    pass
