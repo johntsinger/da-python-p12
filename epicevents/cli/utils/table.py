@@ -36,7 +36,7 @@ FIELDS = {
         'created',
         'updated',
     ],
-    'events': [
+    'event': [
         'id',
         'name',
         'start_date',
@@ -94,7 +94,8 @@ def table_add_column(table, type_obj):
             previous_field = None
         table.add_column(
             field_name.replace('__', ' ').replace('_', ' ').upper(),
-            justify='center'
+            justify='center',
+            no_wrap=True
         )
     return table
 
