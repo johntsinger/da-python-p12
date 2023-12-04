@@ -67,6 +67,10 @@ class BaseToken:
 
 
 class NewToken(BaseToken):
+    """Generate a new token when instanciated
+    and save it to .env file
+    """
+
     def __init__(self, payload):
         self._key = os.environ.get(self.KEY)
         self._payload = payload
@@ -105,6 +109,8 @@ class NewToken(BaseToken):
 
 
 class Token(BaseToken):
+    """Get the current saved token"""
+
     def __init__(self):
         self.token = self._get_token_from_env()
         if not self.token:
@@ -112,6 +118,7 @@ class Token(BaseToken):
 
     @property
     def decode(self):
+        """Decode token and return payload as dict"""
         key = os.environ.get(self.KEY)
         if self._token_is_valid(self.token, key):
             return self._decode_token(self.token, key)
