@@ -44,6 +44,7 @@ class MyUserManager(BaseUserManager):
             first_name=first_name,
             last_name=last_name,
             phone=phone,
+            password=password
         )
         user.groups.add(department)
 
@@ -53,7 +54,7 @@ class MyUserManager(BaseUserManager):
         self,
         email,
         phone,
-        password=None
+        password
     ):
         if not password:
             raise ValueError('SuperUser must have a password')
@@ -112,6 +113,9 @@ class Client(models.Model):
     created = models.DateField(auto_now_add=True)
     updated = models.DateField(auto_now=True)
 
+    def __str__(self):
+        return f'{self.first_name} {self.last_name}'
+
 
 class Contract(models.Model):
     id = models.UUIDField(
@@ -137,6 +141,9 @@ class Contract(models.Model):
         self.full_clean()
         return super().save(*args, **kwargs)
 
+    def __str__(self):
+        return f'{self.id}'
+
 
 class Event(models.Model):
     name = models.CharField(max_length=50)
@@ -153,9 +160,10 @@ class Event(models.Model):
         to=settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         related_name='events',
-        null=True
+        null=True,
+        blank=True
     )
-    note = models.TextField()
+    note = models.TextField(null=True, blank=True)
     created = models.DateField(auto_now_add=True)
     updated = models.DateField(auto_now=True)
 
