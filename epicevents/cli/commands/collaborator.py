@@ -209,3 +209,35 @@ def change(
 
     table = create_table(collaborator)
     console.print(table)
+
+
+@app.command()
+def delete(
+    collaborator: Annotated[
+        List[str],
+        typer.Argument(
+            help="Full name of Collaborator to be deleted."
+        )
+    ],
+):
+    try:
+        collaborator = User.objects.annotate(
+            full_name=Concat(
+                'first_name',
+                V(' '),
+                'last_name'
+            )
+        ).get(
+            full_name=' '.join(collaborator)
+        )
+    except ObjectDoesNotExist:
+        console.print("[red]User not found.")
+        raise typer.Exit()
+
+    delete = typer.confirm(
+        f'Are you sure you want delete {collaborator.get_full_name()} ?'
+    )
+    if not delete:
+        raise typer.Abort()
+    collaborator.delete()
+    console.print("[orange3]Collaborator successfully deleted.")
