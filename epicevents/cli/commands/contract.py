@@ -4,7 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from guardian.shortcuts import assign_perm, remove_perm
 from uuid import UUID
 from cli.utils.console import console
-from cli.utils.callbacks import validate_callback
+from cli.utils.callbacks import validate_callback, allow_sales
 from cli.utils.prompt import prompt_for
 from cli.utils.table import create_table
 from cli.utils.user import get_user
@@ -13,13 +13,103 @@ from orm.models import Contract
 
 app = typer.Typer()
 
+user = get_user()
+
+
+def sales():
+    """Display options for sales department"""
+    if user.is_superuser or user.groups.first().name == 'sales':
+        return False
+    return True
+
 
 @app.command()
-def view():
+def view(
+    ctx: typer.Context,
+    assigned: Annotated[
+        bool,
+        typer.Option(
+            "--assigned",
+            "-a",
+            help="Filter contract assigned to me",
+            callback=allow_sales,
+            hidden=sales()
+        )
+    ] = False,
+    signed: Annotated[
+        bool,
+        typer.Option(
+            "--signed",
+            "-s",
+            help="Filter contract signed",
+            callback=allow_sales,
+            hidden=sales()
+        )
+    ] = False,
+    not_signed: Annotated[
+        bool,
+        typer.Option(
+            "--not-signed",
+            "-n",
+            help="Filter contract not signed",
+            callback=allow_sales,
+            hidden=sales()
+        )
+    ] = False,
+    paid: Annotated[
+        bool,
+        typer.Option(
+            "--paid",
+            "-p",
+            help="Filter contract paid",
+            callback=allow_sales,
+            hidden=sales()
+        )
+    ] = False,
+    unpaid: Annotated[
+        bool,
+        typer.Option(
+            "--unpaid",
+            "-u",
+            help="Filter contract unpaid",
+            callback=allow_sales,
+            hidden=sales()
+        )
+    ] = False,
+):
     """
     View list of all contract.
     """
-    queryset = Contract.objects.all()
+    if signed and not_signed:
+        raise typer.BadParameter(
+            'You can not use both signed and not signed at same time.'
+            ' Please choose only one of them.'
+            ' If you need both use neither of them.'
+        )
+    if paid and unpaid:
+        raise typer.BadParameter(
+            'You can not use both paid and unpaid at same time.'
+            ' Please choose only one of them.'
+            ' If you need both use neither of them.'
+        )
+    querydict = {}
+    for key, value in ctx.params.items():
+        if value:
+            if key == 'assigned':
+                querydict['client__contact'] = user
+            elif key == 'signed':
+                querydict['signed'] = True
+            elif key == 'not_signed':
+                querydict['signed'] = False
+            elif key == 'paid':
+                querydict['balance'] = 0
+            elif key == 'unpaid':
+                querydict['balance__gt'] = 0
+    if querydict:
+        queryset = Contract.objects.filter(**querydict)
+    else:
+        queryset = Contract.objects.all()
+
     table = create_table(queryset)
     if table.columns:
         console.print(table)
@@ -44,13 +134,13 @@ def add(
             "--price",
             prompt=True,
             help="Contract's price",
+            min=0
         )
     ],
 ):
     """
     Create a new contract.
     """
-    user = get_user()
     if not user:
         console.print('[red]Token has expired. Please log in again.')
         raise typer.Exit()
@@ -90,6 +180,7 @@ def change(
             "--price",
             "-p",
             help="Change price",
+            min=0
         )
     ] = False,
     balance: Annotated[
@@ -98,6 +189,7 @@ def change(
             "--balance",
             "-b",
             help="Change balance",
+            min=0
         )
     ] = False,
     signed: Annotated[
@@ -125,7 +217,6 @@ def change(
         console.print("[red]Client not found.")
         raise typer.Exit()
 
-    user = get_user()
     if (
         user.groups.first().name != 'management'
         and not user.has_perm('change_contract', contract)
