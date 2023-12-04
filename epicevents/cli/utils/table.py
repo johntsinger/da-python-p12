@@ -54,18 +54,31 @@ FIELDS = {
 
 
 def get_fields_name(fields):
+    """Parse fields"""
     return [field.replace('__', ' ').replace('_', ' ') for field in fields]
 
 
 def get_type(obj):
+    """Get the type of the object as string"""
     return obj._meta.model.__name__
 
 
 def get_model(obj):
+    """Get the model of the object"""
     return obj._meta.model
 
 
 def create_table(queryset_or_obj):
+    """Create table.
+    If queryset_or_obj is a signle object create
+    a queryset with this object.
+
+    args:
+        queryset_or_obj : a single object or a queryset
+
+    returns:
+        a rich table object
+    """
     try:
         obj = queryset_or_obj.first()
         queryset = queryset_or_obj
@@ -82,6 +95,7 @@ def create_table(queryset_or_obj):
 
 
 def table_add_column(table, type_obj):
+    """Create columns dynamically related to type_obj"""
     previous_field = None
     for field_name in FIELDS[type_obj.lower()]:
         if '__first_name' in field_name:
@@ -101,6 +115,7 @@ def table_add_column(table, type_obj):
 
 
 def table_add_row(table, type_obj, queryset):
+    """Create rows dynamically related to type_obj and queryset"""
     fields = FIELDS[type_obj.lower()]
     for values_tuple in queryset.values_list(*fields, named=True):
         values = []
