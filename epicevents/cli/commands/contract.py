@@ -71,7 +71,7 @@ def view(
         typer.Option(
             "--unpaid",
             "-u",
-            help="Filter contract unpaid",
+            help="Filter contract not paid",
             callback=allow_sales,
             hidden=sales()
         )

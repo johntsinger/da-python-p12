@@ -42,7 +42,7 @@ def view(
         typer.Option(
             "--no-contact",
             "-n",
-            help="Filter event with no contact (support department)",
+            help="Filter event with no contact",
             callback=allow_management,
             hidden=management()
         )
