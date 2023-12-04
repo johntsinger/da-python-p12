@@ -4,11 +4,13 @@ from typing_extensions import Annotated
 from django.db.models import Value as V
 from django.db.models.functions import Concat
 from django.core.exceptions import ObjectDoesNotExist
+from guardian.shortcuts import assign_perm
 from orm.models import Client, Compagny
 from cli.utils.console import console
 from cli.utils.callbacks import validate_callback
 from cli.utils.prompt import prompt_for
 from cli.utils.table import create_table
+from cli.utils.user import get_user
 
 
 app = typer.Typer()
@@ -70,21 +72,15 @@ def add(
             prompt=True,
             help="Client's compagny name",
         )
-    ],
-    contact: Annotated[
-        str,
-        typer.Option(
-            "--contact",
-            prompt=True,
-            help="Client's contact full name (ie: john doe)",
-            callback=validate_callback
-        )
-
     ]
 ):
     """
     Create a new client.
     """
+    user = get_user()
+    if not user:
+        console.print('[red]Token has expired. Please log in again.')
+        raise typer.Exit()
     compagny, created = Compagny.objects.get_or_create(
         name=compagny
     )
@@ -94,8 +90,9 @@ def add(
         email=email,
         phone=phone,
         compagny=compagny,
-        contact=contact
+        contact=user
     )
+    assign_perm('change_client', user, new_client)
     console.print("[green]Client successfully created.")
     table = create_table(new_client)
     console.print(table)
@@ -183,6 +180,11 @@ def change(
         console.print("[red]Client not found.")
         raise typer.Exit()
 
+    user = get_user()
+    if not user.has_perm('change_client', client):
+        console.print("[red]You are not allowed.")
+        raise typer.Exit()
+
     fields_to_change = {}
 
     for key, value in ctx.params.items():
@@ -197,9 +199,10 @@ def change(
                 ctx=ctx
             )
 
-    for key, value in fields_to_change.items():
-        setattr(client, key, value)
-    client.save()
+    if fields_to_change:
+        for key, value in fields_to_change.items():
+            setattr(client, key, value)
+        client.save()
 
     table = create_table(client)
     console.print(table)

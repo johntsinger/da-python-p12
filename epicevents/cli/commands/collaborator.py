@@ -197,14 +197,15 @@ def change(
                 ctx=ctx
             )
 
-    for key, value in fields_to_change.items():
-        if key == "department":
-            collaborator.groups.clear()
-            collaborator.groups.add(value)
-        elif key == "password":
-            value = make_password(value)
-        setattr(collaborator, key, value)
-    collaborator.save()
+    if fields_to_change:
+        for key, value in fields_to_change.items():
+            if key == "department":
+                collaborator.groups.clear()
+                collaborator.groups.add(value)
+            elif key == "password":
+                value = make_password(value)
+            setattr(collaborator, key, value)
+        collaborator.save()
 
     table = create_table(collaborator)
     console.print(table)
