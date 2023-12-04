@@ -109,7 +109,6 @@ def table_add_column(table, type_obj):
         table.add_column(
             field_name.replace('__', ' ').replace('_', ' ').upper(),
             justify='center',
-            no_wrap=True
         )
     return table
 
