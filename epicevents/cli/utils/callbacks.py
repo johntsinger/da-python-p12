@@ -31,6 +31,7 @@ def validate_callback(
 
     # callback called twice inside typer.Option
     # need model __str__ to validate second attempt
+    ctx.user = user
     value, error = validate(params.name, value, ctx=ctx)
     if error:
         raise typer.BadParameter(
