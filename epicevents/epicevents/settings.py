@@ -59,7 +59,11 @@ PERMISSIONS = {
     ],
     'sales': [
         'add_client',
+        'change_client',
+        'change_contract',
         'add_event',
     ],
-    'support': []
+    'support': [
+        'change_event'
+    ]
 }
