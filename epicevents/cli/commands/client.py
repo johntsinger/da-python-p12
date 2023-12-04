@@ -15,6 +15,8 @@ from cli.utils.user import get_user
 
 app = typer.Typer()
 
+user = get_user()
+
 
 @app.command()
 def view():
@@ -77,7 +79,6 @@ def add(
     """
     Create a new client.
     """
-    user = get_user()
     if not user:
         console.print('[red]Token has expired. Please log in again.')
         raise typer.Exit()
@@ -180,7 +181,6 @@ def change(
         console.print("[red]Client not found.")
         raise typer.Exit()
 
-    user = get_user()
     if not user.has_perm('change_client', client):
         console.print("[red]You are not allowed.")
         raise typer.Exit()
