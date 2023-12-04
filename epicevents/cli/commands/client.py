@@ -4,7 +4,7 @@ from typing_extensions import Annotated
 from django.db.models import Value as V
 from django.db.models.functions import Concat
 from django.core.exceptions import ObjectDoesNotExist
-from guardian.shortcuts import assign_perm
+from guardian.shortcuts import assign_perm, remove_perm
 from orm.models import Client, Compagny
 from cli.utils.console import console
 from cli.utils.callbacks import validate_callback
@@ -201,6 +201,9 @@ def change(
 
     if fields_to_change:
         for key, value in fields_to_change.items():
+            if key == 'contact':
+                remove_perm('change_client', user, client)
+                assign_perm('change_client', value, client)
             setattr(client, key, value)
         client.save()
 

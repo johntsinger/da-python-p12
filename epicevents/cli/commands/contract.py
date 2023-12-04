@@ -1,7 +1,7 @@
 import typer
 from typing_extensions import Annotated
 from django.core.exceptions import ObjectDoesNotExist
-from guardian.shortcuts import assign_perm
+from guardian.shortcuts import assign_perm, remove_perm
 from uuid import UUID
 from cli.utils.console import console
 from cli.utils.callbacks import validate_callback
@@ -151,6 +151,13 @@ def change(
 
     if fields_to_change:
         for key, value in fields_to_change.items():
+            if key == 'client':
+                remove_perm(
+                    'change_contract',
+                    contract.client.contact,
+                    contract
+                )
+                assign_perm('change_contract', value.contact, contract)
             setattr(contract, key, value)
         contract.save()
 

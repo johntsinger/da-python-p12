@@ -2,7 +2,7 @@ import typer
 from typing_extensions import Annotated
 from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
-from guardian.shortcuts import assign_perm
+from guardian.shortcuts import assign_perm, remove_perm
 from orm.models import Event, Contract
 from cli.utils.console import console
 from cli.utils.callbacks import validate_callback
@@ -226,15 +226,7 @@ def change(
             continue
         if all_fields:
             value = True
-        if key == 'contact':
-            contact = prompt_for(
-                message=key,
-                validator_name=key,
-                ctx=ctx
-            )
-            fields_to_change[key] = contact
-            assign_perm('change_event', contact, event)
-        elif value:
+        if value:
             fields_to_change[key] = prompt_for(
                 message=key,
                 validator_name=key,
@@ -243,6 +235,9 @@ def change(
 
     if fields_to_change:
         for key, value in fields_to_change.items():
+            if key == 'contact':
+                remove_perm('change_event', event.contact, event)
+                assign_perm('change_event', value, event)
             setattr(event, key, value)
         event.save()
 
