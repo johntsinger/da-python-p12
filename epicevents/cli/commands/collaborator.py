@@ -1,6 +1,7 @@
 import typer
 from typing import List
 from typing_extensions import Annotated
+from sentry_sdk import capture_message, set_context
 from django.db.models import Value as V
 from django.db.models.functions import Concat
 from django.contrib.auth import get_user_model
@@ -10,10 +11,12 @@ from cli.utils.console import console
 from cli.utils.callbacks import validate_callback
 from cli.utils.prompt import prompt_for
 from cli.utils.table import create_table
+from cli.utils.user import get_user
 
 
-User = get_user_model()
+User = get_user_model()  # User model
 app = typer.Typer()
+user = get_user()  # Current loged user
 
 
 @app.command()
@@ -96,6 +99,17 @@ def add(
         password=password,
         phone=phone,
         department=department
+    )
+    set_context(
+        "new user", {
+            "id": user.id,
+            "name": user.get_full_name(),
+            "department": user.groups.first().name
+        }
+    )
+    capture_message(
+        f"User {user.get_full_name()} created user"
+        f" {new_user.get_full_name()}."
     )
     console.print("[green]Collaborator successfully created.")
     table = create_table(new_user)
@@ -208,6 +222,20 @@ def change(
             setattr(collaborator, key, value)
         collaborator.save()
 
+    set_context(
+        "updated_user", {
+            "id": user.id,
+            "name": user.get_full_name(),
+            "department": user.groups.first().name,
+            "fields_updated": ', '.join(
+                str(field) for field in fields_to_change.keys()
+            )
+        }
+    )
+    capture_message(
+        f"User {user.get_full_name()} updated user"
+        f" {collaborator.get_full_name()}."
+    )
     table = create_table(collaborator)
     console.print(table)
 
@@ -221,6 +249,7 @@ def delete(
         )
     ],
 ):
+    """Delete a collaborator"""
     try:
         collaborator = User.objects.annotate(
             full_name=Concat(

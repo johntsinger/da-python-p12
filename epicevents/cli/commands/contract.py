@@ -3,8 +3,9 @@ from typing_extensions import Annotated
 from django.core.exceptions import ObjectDoesNotExist
 from guardian.shortcuts import assign_perm, remove_perm
 from uuid import UUID
+from sentry_sdk import capture_message, set_context
 from cli.utils.console import console
-from cli.utils.callbacks import validate_callback, allow_sales
+from cli.utils.callbacks import validate_callback
 from cli.utils.prompt import prompt_for
 from cli.utils.table import create_table
 from cli.utils.user import get_user
@@ -16,15 +17,6 @@ app = typer.Typer()
 user = get_user()
 
 
-def sales():
-    """Display options for sales department"""
-    if not user:
-        return True
-    if user.is_superuser or user.groups.first().name == 'sales':
-        return False
-    return True
-
-
 @app.command()
 def view(
     ctx: typer.Context,
@@ -34,8 +26,6 @@ def view(
             "--assigned",
             "-a",
             help="Filter contract assigned to me",
-            callback=allow_sales,
-            hidden=sales()
         )
     ] = False,
     signed: Annotated[
@@ -44,8 +34,6 @@ def view(
             "--signed",
             "-s",
             help="Filter contract signed",
-            callback=allow_sales,
-            hidden=sales()
         )
     ] = False,
     not_signed: Annotated[
@@ -54,8 +42,6 @@ def view(
             "--not-signed",
             "-n",
             help="Filter contract not signed",
-            callback=allow_sales,
-            hidden=sales()
         )
     ] = False,
     paid: Annotated[
@@ -64,8 +50,6 @@ def view(
             "--paid",
             "-p",
             help="Filter contract paid",
-            callback=allow_sales,
-            hidden=sales()
         )
     ] = False,
     unpaid: Annotated[
@@ -74,8 +58,6 @@ def view(
             "--unpaid",
             "-u",
             help="Filter contract not paid",
-            callback=allow_sales,
-            hidden=sales()
         )
     ] = False,
 ):
@@ -155,6 +137,19 @@ def add(
         signed=signed,
     )
     assign_perm('change_contract', new_contract.client.contact, new_contract)
+    if new_contract.signed:
+        set_context(
+            "contract_signed", {
+                "id": new_contract.id,
+                "client": new_contract.client,
+                "contact": new_contract.client.contact,
+                "signed": new_contract.signed
+            }
+        )
+        capture_message(
+            f"Contract {new_contract.id}"
+            f" signed by client {new_contract.client}."
+        )
     console.print("[green]Client successfully created.")
     table = create_table(new_contract)
     console.print(table)
@@ -234,7 +229,7 @@ def change(
             continue
         if all_fields:
             value = True
-        if key == "signed":
+        if key == "signed" and value:
             fields_to_change[key] = typer.confirm('Contract signed ?')
         elif value:
             fields_to_change[key] = prompt_for(
@@ -254,6 +249,20 @@ def change(
                 assign_perm('change_contract', value.contact, contract)
             setattr(contract, key, value)
         contract.save()
+
+    if fields_to_change['signed'] is True:
+        set_context(
+            "contract_signed", {
+                "id": contract.id,
+                "client": contract.client,
+                "contact": contract.client.contact,
+                "signed": contract.signed
+            }
+        )
+        capture_message(
+            f"Contract {contract.id}"
+            f" signed by client {contract.client}."
+        )
 
     table = create_table(contract)
     console.print(table)

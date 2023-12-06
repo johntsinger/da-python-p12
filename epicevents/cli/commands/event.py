@@ -5,11 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from guardian.shortcuts import assign_perm, remove_perm
 from orm.models import Event, Contract
 from cli.utils.console import console
-from cli.utils.callbacks import (
-    validate_callback,
-    allow_management,
-    allow_support
-)
+from cli.utils.callbacks import validate_callback
 from cli.utils.table import create_table
 from cli.utils.prompt import prompt_for
 from cli.utils.user import get_user
@@ -18,24 +14,6 @@ from cli.utils.user import get_user
 app = typer.Typer()
 
 user = get_user()
-
-
-def management():
-    """Display options for management department"""
-    if not user:
-        return True
-    if user.is_superuser or user.groups.first().name == 'management':
-        return False
-    return True
-
-
-def support():
-    """Display options for support department"""
-    if not user:
-        return True
-    if user.is_superuser or user.groups.first().name == 'support':
-        return False
-    return True
 
 
 @app.command()
@@ -47,8 +25,6 @@ def view(
             "--no-contact",
             "-n",
             help="Filter event with no contact",
-            callback=allow_management,
-            hidden=management()
         )
     ] = False,
     assigned: Annotated[
@@ -57,8 +33,6 @@ def view(
             "--assigned",
             "-a",
             help="Filter event assigned to me",
-            callback=allow_support,
-            hidden=support()
         )
     ] = False,
 ):
@@ -117,6 +91,7 @@ def add(
                 "%d%m%Y %H",
             ],
             help="Event's start date",
+            callback=validate_callback
         )
     ],
     end_date: Annotated[
@@ -133,6 +108,7 @@ def add(
                 "%d%m%Y %H",
             ],
             help="Event's end date",
+            callback=validate_callback
         )
     ],
     location: Annotated[
