@@ -1,5 +1,6 @@
 import re
 import typer
+from datetime import datetime
 from django.core.validators import EmailValidator
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db.models import Value as V
@@ -64,6 +65,10 @@ def validate_contract(value, ctx):
         raise ValidationError(
             "Contract not found"
         )
+    except ValidationError:
+        raise ValidationError(
+            f"{value} is not a valid contract ID"
+        )
     if not contract.client.contact == ctx.user:
         console.print(
             "Error: [red]You are not the contact of this client's contract"
@@ -126,6 +131,23 @@ def validate_compagny(value, ctx):
     return compagny
 
 
+def validate_start_date(value, ctx):
+    if datetime.now() > value:
+        raise ValidationError(
+            "Start date cannot be in the past"
+        )
+    return value
+
+
+def validate_end_date(value, ctx):
+    start_date = ctx.params.get('start_date')
+    if value < start_date:
+        raise ValidationError(
+            "End date cannot be earlier than start date"
+        )
+    return value
+
+
 def validate_password(value, ctx):
     confirmation = typer.prompt("Repeat for confirmation")
     if value != confirmation:
@@ -173,5 +195,7 @@ VALIDATORS = {
     'contact': validate_contact,
     'compagny': validate_compagny,
     'client': validate_client,
-    'contract': validate_contract
+    'contract': validate_contract,
+    'start_date': validate_start_date,
+    'end_date': validate_end_date,
 }
