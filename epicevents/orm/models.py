@@ -124,7 +124,7 @@ class Contract(models.Model):
         editable=False,
         default=uuid.uuid4,
     )
-    client = models.OneToOneField(
+    client = models.ForeignKey(
         to=Client,
         on_delete=models.PROTECT,
         related_name='client'
