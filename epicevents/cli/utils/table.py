@@ -106,10 +106,20 @@ def table_add_column(table, type_obj):
         if previous_field:
             field_name = f"{field_name.split('__')[-2]} name"
             previous_field = None
-        table.add_column(
-            field_name.replace('__', ' ').replace('_', ' ').upper(),
-            justify='center',
-        )
+        if (
+            field_name == "id" and type_obj == "Contract"
+            or field_name == "contract" and type_obj == "Event"
+        ):
+            table.add_column(
+                field_name.replace('__', ' ').replace('_', ' ').upper(),
+                justify='center',
+                min_width=36
+            )
+        else:
+            table.add_column(
+                field_name.replace('__', ' ').replace('_', ' ').upper(),
+                justify='center',
+            )
     return table
 
 
