@@ -1,12 +1,16 @@
 import typer
 from typing import List
 from typing_extensions import Annotated
-from sentry_sdk import capture_message, set_context
 from django.db.models import Value as V
 from django.db.models.functions import Concat
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist
+from cli.utils.sentry import (
+    capture_user_creation,
+    capture_user_update,
+    capture_user_deleted
+)
 from cli.utils.console import console
 from cli.utils.callbacks import validate_callback
 from cli.utils.prompt import prompt_for
@@ -100,17 +104,10 @@ def add(
         phone=phone,
         department=department
     )
-    set_context(
-        "new user", {
-            "id": user.id,
-            "name": user.get_full_name(),
-            "department": user.groups.first().name
-        }
-    )
-    capture_message(
-        f"User {user.get_full_name()} created user"
-        f" {new_user.get_full_name()}."
-    )
+
+    # sentry capture user created
+    capture_user_creation(user, new_user)
+
     console.print("[green]Collaborator successfully created.")
     table = create_table(new_user)
     console.print(table)
@@ -221,21 +218,12 @@ def change(
                 value = make_password(value)
             setattr(collaborator, key, value)
         collaborator.save()
+        console.print('[green]User successfully updated')
 
-    set_context(
-        "updated_user", {
-            "id": user.id,
-            "name": user.get_full_name(),
-            "department": user.groups.first().name,
-            "fields_updated": ', '.join(
-                str(field) for field in fields_to_change.keys()
-            )
-        }
-    )
-    capture_message(
-        f"User {user.get_full_name()} updated user"
-        f" {collaborator.get_full_name()}."
-    )
+    # sentry capture user updated
+    fields = list(fields_to_change.keys())
+    capture_user_update(user, collaborator, fields)
+
     table = create_table(collaborator)
     console.print(table)
 
@@ -269,5 +257,9 @@ def delete(
     )
     if not delete:
         raise typer.Abort()
+
     collaborator.delete()
     console.print("[orange3]Collaborator successfully deleted.")
+
+    # sentry capture user deleted
+    capture_user_deleted(user, collaborator)

@@ -70,8 +70,14 @@ PERMISSIONS = {
     ]
 }
 
+# Sentry ingore errors
+ignore_errors = [KeyboardInterrupt]
+
+# Sentry init
+
 sentry_sdk.init(
     dsn=os.environ.get('DNS'),
+    ignore_errors=ignore_errors,
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     traces_sample_rate=1.0,
