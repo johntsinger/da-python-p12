@@ -37,7 +37,7 @@ def validate_unique_email(value):
         or Client.objects.filter(email=value).exists()
     ):
         raise ValidationError(
-            f"This email is already exists"
+            "This email is already exists"
         )
 
 
@@ -47,11 +47,11 @@ def validate_unique_phone(value):
         or Client.objects.filter(phone=value).exists()
     ):
         raise ValidationError(
-            f"This phone is already exists"
+            "This phone is already exists"
         )
 
 
-def validate_unique_contract(value):
+def validate_unique_event_for_contract(value):
     if Event.objects.filter(contract=value).exists():
         raise ValidationError(
             'Event with this Contract already exists.'
@@ -77,7 +77,7 @@ def validate_contract(value, ctx):
     if not contract.signed:
         console.print("Error: [red]This contract has not yet been signed")
         raise typer.Exit()
-    validate_unique_contract(contract)
+    validate_unique_event_for_contract(contract)
     return contract
 
 
@@ -170,7 +170,7 @@ def validate_phone(value, ctx):
     phone_regex = r'^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$'
     if not re.match(phone_regex, value):
         raise ValidationError(
-            f"Enter a valid phone number"
+            "Enter a valid phone number"
         )
     value = normalize_phone(value)
     validate_unique_phone(value)

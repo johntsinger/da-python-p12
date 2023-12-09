@@ -204,7 +204,7 @@ def change(
     try:
         contract = Contract.objects.get(id=contract_id)
     except ObjectDoesNotExist:
-        console.print("[red]Client not found.")
+        console.print("[red]Contract not found.")
         raise typer.Exit()
 
     if (
