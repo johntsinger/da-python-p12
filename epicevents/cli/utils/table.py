@@ -53,11 +53,6 @@ FIELDS = {
 }
 
 
-def get_fields_name(fields):
-    """Parse fields"""
-    return [field.replace('__', ' ').replace('_', ' ') for field in fields]
-
-
 def get_type(obj):
     """Get the type of the object as string"""
     return obj._meta.model.__name__
