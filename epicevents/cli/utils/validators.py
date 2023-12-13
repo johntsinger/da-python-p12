@@ -22,7 +22,8 @@ def validate_value(validator_name, value, ctx):
 
 def validate(validator_name, value, ctx):
     """Validator manager"""
-    value = value.strip()
+    if not isinstance(value, datetime):
+        value = value.strip()
     try:
         value = VALIDATORS[validator_name](value, ctx)
     except KeyError:
@@ -132,16 +133,50 @@ def validate_compagny(value, ctx):
     return compagny
 
 
+def format_date(value):
+    formats = [
+        "%d-%m-%Y %H:%M",
+        "%d %m %Y %H:%M",
+        "%d%m%Y %H:%M",
+        "%d-%m-%Y %H",
+        "%d %m %Y %H",
+        "%d%m%Y %H",
+    ]
+    date = None
+    for form in formats:
+        try:
+            date = datetime.strptime(value, form)
+        except ValueError:
+            pass
+    if not date:
+        raise ValidationError(
+            f"{value} does not match the format"
+            f" {', '.join(form for form in formats)}"
+        )
+    return date
+
+
 def validate_start_date(value, ctx):
+    if not isinstance(value, datetime):
+        value = format_date(value)
     if datetime.now() > value:
         raise ValidationError(
             "Start date cannot be in the past"
+        )
+    if ctx.info_name == 'change' and value > ctx.end_date:
+        raise ValidationError(
+            "Start date cannot be after end date"
         )
     return value
 
 
 def validate_end_date(value, ctx):
-    start_date = ctx.params.get('start_date')
+    if not isinstance(value, datetime):
+        value = format_date(value)
+    if ctx.info_name == 'change':
+        start_date = ctx.start_date
+    else:
+        start_date = ctx.params.get('start_date', None)
     if value < start_date:
         raise ValidationError(
             "End date cannot be earlier than start date"
