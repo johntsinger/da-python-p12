@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from django.core.management.base import BaseCommand
 
@@ -19,7 +18,7 @@ class Command(BaseCommand):
         except KeyError:
             dns = input('DNS : ')
 
-        file_name = Path(".dns.env")
+        file_name = Path(".env.dns")
         if not Path.is_file(file_name):
             with open(file_name, 'w') as file:
                 file.write(
