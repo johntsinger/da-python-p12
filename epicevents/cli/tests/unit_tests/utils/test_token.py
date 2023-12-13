@@ -63,13 +63,14 @@ class TestBaseToken(TestCase):
         self,
         mock_os_environ,
     ):
-        if os.path.exists('.env.test'):
-            os.remove('.env.test')
-        BaseToken._save_token_to_env('token', file_name='.env.test')
+        if os.path.exists('.env.test.test'):
+            os.remove('.env.test.test')
+        BaseToken._save_token_to_env('token', file_name='.env.test.test')
         self.assertEqual(
             mock_os_environ.return_value,
             'token'
         )
+        os.remove('.env.test.test')
 
     def test_delete_token_from_env(self):
         BaseToken._delete_token_from_env()
