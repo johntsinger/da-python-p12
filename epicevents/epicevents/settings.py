@@ -6,18 +6,20 @@ from epicevents.init_crm import generate_secret_key
 import sentry_sdk
 
 
-# testing variable
+# Testing variable
 TESTING = sys.argv[1:2] == ['test']
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# load environment variables
+# Load environment variables
 load_dotenv(BASE_DIR / '.env')
 load_dotenv(BASE_DIR / '.env.dns')
 
+# Get secret key
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
+# If not secret key gernerate it
 if not SECRET_KEY:
     generate_secret_key(BASE_DIR)
 
