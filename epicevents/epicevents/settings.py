@@ -1,16 +1,20 @@
+import sys
+import os
 from pathlib import Path
 from dotenv import load_dotenv
-import os
 from epicevents.init_crm import generate_secret_key
 import sentry_sdk
 
+
+# testing variable
+TESTING = sys.argv[1:2] == ['test']
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # load environment variables
 load_dotenv(BASE_DIR / '.env')
-load_dotenv(BASE_DIR / '.dns.env')
+load_dotenv(BASE_DIR / '.env.dns')
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
@@ -74,15 +78,15 @@ PERMISSIONS = {
 ignore_errors = [KeyboardInterrupt]
 
 # Sentry init
-
-sentry_sdk.init(
-    dsn=os.environ.get('DNS'),
-    ignore_errors=ignore_errors,
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for performance monitoring.
-    traces_sample_rate=1.0,
-    # Set profiles_sample_rate to 1.0 to profile 100%
-    # of sampled transactions.
-    # We recommend adjusting this value in production.
-    profiles_sample_rate=1.0,
-)
+if not TESTING:
+    sentry_sdk.init(
+        dsn=os.environ.get('DNS'),
+        ignore_errors=ignore_errors,
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        traces_sample_rate=1.0,
+        # Set profiles_sample_rate to 1.0 to profile 100%
+        # of sampled transactions.
+        # We recommend adjusting this value in production.
+        profiles_sample_rate=1.0,
+    )
