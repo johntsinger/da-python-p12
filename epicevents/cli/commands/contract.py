@@ -14,8 +14,6 @@ from orm.models import Contract
 
 app = typer.Typer()
 
-user = get_user()
-
 
 @app.command()
 def view(
@@ -64,6 +62,11 @@ def view(
     """
     View list of all contract.
     """
+    user = get_user()
+    if not user:
+        console.print('[red]Token has expired. Please log in again.')
+        raise typer.Exit()
+
     if signed and not_signed:
         raise typer.BadParameter(
             'You can not use both signed and not signed at same time.'
@@ -126,9 +129,11 @@ def add(
     Create a new contract.
     Options are prompted if omitted.
     """
+    user = get_user()
     if not user:
         console.print('[red]Token has expired. Please log in again.')
         raise typer.Exit()
+
     signed = typer.confirm('Contract signed ?')
     new_contract = Contract.objects.create(
         client=client,
@@ -142,7 +147,7 @@ def add(
     if new_contract.signed:
         capture_contract_signed(new_contract)
 
-    console.print("[green]Client successfully created.")
+    console.print("[green]Contract successfully created.")
     table = create_table(new_contract)
     console.print(table)
 
@@ -201,6 +206,11 @@ def change(
     """
     Update a contract.
     """
+    user = get_user()
+    if not user:
+        console.print('[red]Token has expired. Please log in again.')
+        raise typer.Exit()
+
     try:
         contract = Contract.objects.get(id=contract_id)
     except ObjectDoesNotExist:
@@ -241,10 +251,11 @@ def change(
                 assign_perm('change_contract', value.contact, contract)
             setattr(contract, key, value)
         contract.save()
+        console.print('[green]Contract successfully updated.')
 
-    # sentry capture contract signed
-    if fields_to_change['signed'] is True:
-        capture_contract_signed(contract)
+        # sentry capture contract signed
+        if fields_to_change.get('signed') is True:
+            capture_contract_signed(contract)
 
     table = create_table(contract)
     console.print(table)
