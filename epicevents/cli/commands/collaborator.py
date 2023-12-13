@@ -20,7 +20,6 @@ from cli.utils.user import get_user
 
 User = get_user_model()  # User model
 app = typer.Typer()
-user = get_user()  # Current loged user
 
 
 @app.command()
@@ -96,6 +95,10 @@ def add(
     Create a new collaborator.
     Options are prompted if omitted.
     """
+    user = get_user()
+    if not user:
+        console.print('[red]Token has expired. Please log in again.')
+        raise typer.Exit()
     new_user = User.objects.create_user(
         first_name=first_name,
         last_name=last_name,
@@ -181,6 +184,10 @@ def change(
     """
     Update a collaborator.
     """
+    user = get_user()
+    if not user:
+        console.print('[red]Token has expired. Please log in again.')
+        raise typer.Exit()
     try:
         collaborator = User.objects.annotate(
             full_name=Concat(
@@ -218,7 +225,7 @@ def change(
                 value = make_password(value)
             setattr(collaborator, key, value)
         collaborator.save()
-        console.print('[green]User successfully updated')
+        console.print('[green]User successfully updated.')
 
     # sentry capture user updated
     fields = list(fields_to_change.keys())
@@ -238,6 +245,10 @@ def delete(
     ],
 ):
     """Delete a collaborator"""
+    user = get_user()
+    if not user:
+        console.print('[red]Token has expired. Please log in again.')
+        raise typer.Exit()
     try:
         collaborator = User.objects.annotate(
             full_name=Concat(
