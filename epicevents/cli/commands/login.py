@@ -2,6 +2,7 @@ import typer
 from typing_extensions import Annotated
 from datetime import datetime, timedelta, timezone
 from django.contrib.auth import authenticate
+from django.conf import settings
 from cli.utils.console import console
 from cli.utils.callbacks import validate_callback
 from cli.utils.token import NewToken
@@ -40,9 +41,9 @@ def login(
             'user_id': user.id,
             'sub': user.get_full_name(),
             'iss': 'epicevents_crm',
-            'exp': datetime.now(tz=timezone.utc) + timedelta(hours=12)
+            'exp': datetime.now(tz=timezone.utc) + timedelta(minutes=15)
         }
-        NewToken(payload)
+        NewToken(payload, testing=settings.TESTING)
         console.print('[green]Successfully logged in')
     else:
         console.print("[red]Wrong email or password.")
