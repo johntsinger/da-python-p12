@@ -1,17 +1,6 @@
 from sentry_sdk import set_context, capture_message
 
 
-def set_user_context(key, user):
-    set_context(
-        key, {
-            "id": user.id,
-            "first_name": user.first_name.capitalize(),
-            "last_name": user.last_name.capitalize(),
-            "department": user.groups.first().name
-        }
-    )
-
-
 def capture_user_creation(user, collaborator_created):
     set_context(
         "User_created",
@@ -59,6 +48,29 @@ def capture_user_update(user, collaborator_updated, fields_changed):
     )
 
 
+def capture_user_deleted(user, collaborator_deleted):
+    set_context(
+        "User_deleted",
+        {
+            "by_user": {
+                "id": user.id,
+                "name": user.get_full_name(),
+                "department": user.groups.first().name
+            },
+            "deleted_user": {
+                "id": collaborator_deleted.id,
+                "name": collaborator_deleted.get_full_name(),
+                "department": collaborator_deleted.groups.first().name
+            }
+        }
+    )
+    capture_message(
+        f"User {user.first_name.capitalize()} {user.last_name.capitalize()}"
+        f" has deleted user {collaborator_deleted.first_name.capitalize()}"
+        f" {collaborator_deleted.last_name.capitalize()}."
+    )
+
+
 def capture_contract_signed(contract):
     set_context(
         "Contract", {
@@ -81,27 +93,4 @@ def capture_contract_signed(contract):
         f"Contract {contract.id} signed by client"
         f" {contract.client.first_name.capitalize()}"
         f" {contract.client.last_name.capitalize()}."
-    )
-
-
-def capture_user_deleted(user, collaborator_deleted):
-    set_context(
-        "User_deleted",
-        {
-            "by_user": {
-                "id": user.id,
-                "name": user.get_full_name(),
-                "department": user.groups.first().name
-            },
-            "deleted_user": {
-                "id": collaborator_deleted.id,
-                "name": collaborator_deleted.get_full_name(),
-                "department": collaborator_deleted.groups.first().name
-            }
-        }
-    )
-    capture_message(
-        f"User {user.first_name.capitalize()} {user.last_name.capitalize()}"
-        f" has deleted user {collaborator_deleted.first_name.capitalize()}"
-        f" {collaborator_deleted.last_name.capitalize()}."
     )
