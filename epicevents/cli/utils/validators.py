@@ -22,6 +22,7 @@ def validate_value(validator_name, value, ctx):
 
 def validate(validator_name, value, ctx):
     """Validator manager"""
+    value = value.strip()
     try:
         value = VALIDATORS[validator_name](value, ctx)
     except KeyError:
