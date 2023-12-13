@@ -62,10 +62,13 @@ def capture_user_update(user, collaborator_updated, fields_changed):
 def capture_contract_signed(contract):
     set_context(
         "Contract", {
-            "id": contract.id,
+            "id": str(contract.id),
             "client": {
                 "id": contract.client.id,
-                "Name": contract.client.get_full_name()
+                "Name": (
+                    f'{contract.client.first_name}'
+                    f' {contract.client.last_name}'
+                )
             },
             "contact": {
                 "id": contract.client.contact.id,
