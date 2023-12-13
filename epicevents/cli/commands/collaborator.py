@@ -227,9 +227,9 @@ def change(
         collaborator.save()
         console.print('[green]User successfully updated.')
 
-    # sentry capture user updated
-    fields = list(fields_to_change.keys())
-    capture_user_update(user, collaborator, fields)
+        # sentry capture user updated
+        fields = list(fields_to_change.keys())
+        capture_user_update(user, collaborator, fields)
 
     table = create_table(collaborator)
     console.print(table)
