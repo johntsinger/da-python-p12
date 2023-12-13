@@ -1,5 +1,6 @@
 import os
 import jwt
+import time
 from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 from django.test import TestCase
@@ -28,7 +29,11 @@ class TestBaseToken(TestCase):
 
     def test_create_env_file(self):
         if os.path.exists('.env.test'):
-            os.remove('.env.test')
+            try:
+                os.remove('.env.test')
+            except PermissionError:
+                time.sleep(0.1)
+                os.remove('.env.test')
         content = ''
         BaseToken.create_env_file(content, file_name='.env.test')
         self.assertTrue(os.path.exists('.env.test'))
