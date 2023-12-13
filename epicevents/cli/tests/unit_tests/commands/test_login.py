@@ -43,3 +43,18 @@ class TestLogin(BaseTestCase):
             'Wrong email or password.',
             result.stdout
         )
+
+    def test_bad_parameter(self):
+        result = self.runner.invoke(
+            app,
+            ['login'],
+            input=(
+                'user\n'
+                'user@sales.com\n'
+                'wrong password\n'
+            )
+        )
+        self.assertIn(
+            'Error: Enter a valid email address.',
+            result.stdout
+        )
