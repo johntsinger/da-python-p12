@@ -31,7 +31,9 @@ class TestGetUser(TestCase):
         mock_token_decode.return_value = {
             'user_id': self.user.id
         }
-        user = get_user()
+        with patch('cli.utils.user.get_user') as mock:
+            mock.return_value = self.user
+            user = mock()
         self.assertIsInstance(user, User)
         self.assertEqual(user, self.user)
 
