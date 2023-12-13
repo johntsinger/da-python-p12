@@ -269,8 +269,8 @@ def delete(
     if not delete:
         raise typer.Abort()
 
-    collaborator.delete()
-    console.print("[orange3]Collaborator successfully deleted.")
-
     # sentry capture user deleted
     capture_user_deleted(user, collaborator)
+
+    collaborator.delete()
+    console.print("[orange3]Collaborator successfully deleted.")
