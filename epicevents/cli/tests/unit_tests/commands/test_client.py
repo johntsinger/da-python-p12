@@ -161,7 +161,7 @@ class TestChange(BaseTestCase):
         assign_perm('change_client', cls.user_sales, cls.client)
         cls.login('user@sales.com')
 
-    def test_change_invalid_user(self):
+    def test_change_invalid_client(self):
         result = self.runner.invoke(
             app,
             ['client', 'change', 'invalid client'],
