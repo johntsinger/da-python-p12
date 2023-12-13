@@ -31,7 +31,7 @@ class BaseToken:
                 file.write(f'TOKEN={token}')
         else:
             os.environ[cls.TOKEN] = token
-            set_key('.env', cls.TOKEN, token)
+            set_key(file_name, cls.TOKEN, token)
 
     @classmethod
     def _delete_token_from_env(cls):
@@ -47,14 +47,22 @@ class BaseToken:
             return jwt.decode(token, key, algorithms='HS256')
         try:
             return jwt.decode(token, key, algorithms='HS256')
-        except jwt.ExpiredSignatureError:
+        except (
+            jwt.ExpiredSignatureError,
+            jwt.DecodeError,
+            jwt.InvalidSignatureError
+        ):
             return None
 
     @classmethod
     def _token_is_valid(cls, token, key):
         try:
             cls._decode_token(token, key)
-        except jwt.ExpiredSignatureError:
+        except (
+            jwt.ExpiredSignatureError,
+            jwt.DecodeError,
+            jwt.InvalidSignatureError
+        ):
             return False
         return True
 
@@ -71,7 +79,10 @@ class NewToken(BaseToken):
     and save it to .env file
     """
 
-    def __init__(self, payload):
+    def __init__(self, payload, file_name='.env', testing=False):
+        self._file_name = file_name
+        if testing:
+            self._file_name = '.env.test'
         self._key = os.environ.get(self.KEY)
         self._payload = payload
         self._create_token()
@@ -105,7 +116,7 @@ class NewToken(BaseToken):
             else:
                 self._delete_token_from_env()
         token = self._new_token()
-        self._save_token_to_env(token)
+        self._save_token_to_env(token, file_name=self._file_name)
 
 
 class Token(BaseToken):
