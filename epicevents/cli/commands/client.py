@@ -15,8 +15,6 @@ from cli.utils.user import get_user
 
 app = typer.Typer()
 
-user = get_user()
-
 
 @app.command()
 def view():
@@ -80,6 +78,7 @@ def add(
     Create a new client.
     Options are prompted if omitted.
     """
+    user = get_user()
     if not user:
         console.print('[red]Token has expired. Please log in again.')
         raise typer.Exit()
@@ -168,6 +167,10 @@ def change(
     """
     Update a client.
     """
+    user = get_user()
+    if not user:
+        console.print('[red]Token has expired. Please log in again.')
+        raise typer.Exit()
     try:
         client = Client.objects.annotate(
             full_name=Concat(
@@ -207,6 +210,7 @@ def change(
                 assign_perm('change_client', value, client)
             setattr(client, key, value)
         client.save()
+        console.print('[green]Client successfully updated.')
 
     table = create_table(client)
     console.print(table)
