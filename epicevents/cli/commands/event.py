@@ -1,6 +1,7 @@
 import typer
 from typing_extensions import Annotated
 from datetime import datetime
+from uuid import UUID
 from django.core.exceptions import ObjectDoesNotExist
 from guardian.shortcuts import assign_perm, remove_perm
 from orm.models import Event, Contract
@@ -12,8 +13,6 @@ from cli.utils.user import get_user
 
 
 app = typer.Typer()
-
-user = get_user()
 
 
 @app.command()
@@ -39,6 +38,11 @@ def view(
     """
     View list of all events.
     """
+    user = get_user()
+    if not user:
+        console.print('[red]Token has expired. Please log in again.')
+        raise typer.Exit()
+
     querydict = {}
     for key, value in ctx.params.items():
         if value:
@@ -159,7 +163,7 @@ def add(
 def change(
     ctx: typer.Context,
     contract_id: Annotated[
-        str,
+        UUID,
         typer.Argument(
             help="Event's contract id"
         )
@@ -204,14 +208,6 @@ def change(
             help="Change number of attendees",
         )
     ] = False,
-    contract: Annotated[
-        bool,
-        typer.Option(
-            "--contract",
-            "-c",
-            help="Change contract",
-        )
-    ] = False,
     contact: Annotated[
         bool,
         typer.Option(
@@ -239,6 +235,12 @@ def change(
     """
     Update an event.
     """
+    user = get_user()
+    if not user:
+        console.print('[red]Token has expired. Please log in again.')
+        raise typer.Exit()
+    ctx.user = user
+
     try:
         event = Contract.objects.get(id=contract_id).event
     except ObjectDoesNotExist:
@@ -259,20 +261,33 @@ def change(
             continue
         if all_fields:
             value = True
+        elif key == 'end_date' and not value and start_date:
+            value = True
         if value:
-            fields_to_change[key] = prompt_for(
-                message=key,
-                validator_name=key,
-                ctx=ctx
-            )
+            if key == 'note':
+                fields_to_change[key] = typer.prompt(key, default=None)
+            else:
+                if key == 'start_date' and not end_date:
+                    ctx.end_date = event.end_date
+                elif key == 'end_date' and not start_date:
+                    ctx.start_date = event.start_date
+                fields_to_change[key] = prompt_for(
+                    message=key,
+                    validator_name=key,
+                    ctx=ctx
+                )
+                if key == 'start_date':
+                    ctx.start_date = fields_to_change[key]
 
     if fields_to_change:
         for key, value in fields_to_change.items():
             if key == 'contact':
-                remove_perm('change_event', event.contact, event)
+                if event.contact is not None:
+                    remove_perm('change_event', event.contact, event)
                 assign_perm('change_event', value, event)
             setattr(event, key, value)
         event.save()
+        console.print('[green]Event successfully updated.')
 
     table = create_table(event)
     console.print(table)
