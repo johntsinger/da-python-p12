@@ -164,11 +164,28 @@ class TestValidatePassword(TestCase):
             )
 
 
+class TestFormatDate(TestCase):
+    date_str_valid = '10 01 2024 10'
+    date_str_invalid = 'invalid date'
+
+    def test_format_date_valid(self):
+        date = validators.format_date(self.date_str_valid)
+        self.assertIsInstance(date, datetime)
+
+    def test_format_date_invalid(self):
+        self.assertRaises(
+            ValidationError,
+            validators.format_date,
+            value=self.date_str_invalid
+        )
+
+
 class TestValidateDate(ContextMixin, TestCase):
     start_date = datetime.now() + timedelta(days=1)
     invalid_start_date = datetime.now() - timedelta(days=1)
     end_date = start_date + timedelta(hours=5)
     invalid_end_date = start_date - timedelta(hours=5)
+    start_date_after_end_date = end_date + timedelta(hours=5)
 
     @classmethod
     def setUpClass(cls):
@@ -176,7 +193,10 @@ class TestValidateDate(ContextMixin, TestCase):
         cls.ctx.params['start_date'] = cls.start_date
 
     def test_start_date_valid(self):
-        start_date = validators.validate_start_date(self.start_date, ctx=None)
+        start_date = validators.validate_start_date(
+            self.start_date,
+            ctx=self.ctx
+        )
         self.assertEqual(start_date, self.start_date)
 
     def test_start_date_invalid(self):
@@ -196,6 +216,16 @@ class TestValidateDate(ContextMixin, TestCase):
             ValidationError,
             validators.validate_end_date,
             value=self.invalid_end_date,
+            ctx=self.ctx
+        )
+
+    def test_start_date_after_end_date(self):
+        self.ctx.info_name = 'change'
+        self.ctx.end_date = self.end_date
+        self.assertRaises(
+            ValidationError,
+            validators.validate_start_date,
+            value=self.start_date_after_end_date,
             ctx=self.ctx
         )
 
