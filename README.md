@@ -2,9 +2,7 @@
 
 ## Description
 
-CRM (Customer Relationship Management) with command-line interface using django orm standalone.
-
-
+CRM (Customer Relationship Management) with command-line interface using django orm as a standalone.
 
 ## Installation guide
 
