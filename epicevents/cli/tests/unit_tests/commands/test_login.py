@@ -26,7 +26,7 @@ class TestLogin(BaseTestCase):
         result = self.runner.invoke(
             app,
             ['login'],
-            input=f'user@sales.com\npassword\n'
+            input='user@sales.com\npassword\n'
         )
         self.assertIn(
             'Successfully logged in',
@@ -37,7 +37,7 @@ class TestLogin(BaseTestCase):
         result = self.runner.invoke(
             app,
             ['login'],
-            input=f'user@sales.com\nwrong password\n'
+            input='user@sales.com\nwrong password\n'
         )
         self.assertIn(
             'Wrong email or password.',
