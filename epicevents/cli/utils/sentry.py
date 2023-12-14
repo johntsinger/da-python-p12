@@ -7,8 +7,10 @@ def capture_user_creation(user, collaborator_created):
         {
             "by_user": {
                 "id": user.id,
-                "name": user.get_full_name(),
-                "department": user.groups.first().name
+                "name": user.get_full_name() or user.email,
+                "department":
+                    user.groups.first().name
+                    if user.groups.exists() else 'admin'
             },
             "created_user": {
                 "id": collaborator_created.id,
@@ -18,7 +20,8 @@ def capture_user_creation(user, collaborator_created):
         }
     )
     capture_message(
-        f"User {user.first_name.capitalize()} {user.last_name.capitalize()}"
+        f"User {user.first_name.capitalize() or user.email}"
+        f" {user.last_name.capitalize()}"
         f" has created user {collaborator_created.first_name.capitalize()}"
         f" {collaborator_created.last_name.capitalize()}."
     )
@@ -30,8 +33,10 @@ def capture_user_update(user, collaborator_updated, fields_changed):
         {
             "by_user": {
                 "id": user.id,
-                "name": user.get_full_name(),
-                "department": user.groups.first().name
+                "name": user.get_full_name() or user.email,
+                "department":
+                    user.groups.first().name
+                    if user.groups.exists() else 'admin'
             },
             "updated_user": {
                 "id": collaborator_updated.id,
@@ -42,7 +47,8 @@ def capture_user_update(user, collaborator_updated, fields_changed):
         }
     )
     capture_message(
-        f"User {user.first_name.capitalize()} {user.last_name.capitalize()}"
+        f"User {user.first_name.capitalize() or user.email}"
+        f" {user.last_name.capitalize()}"
         f" has updated user {collaborator_updated.first_name.capitalize()}"
         f" {collaborator_updated.last_name.capitalize()}."
     )
@@ -54,8 +60,10 @@ def capture_user_deleted(user, collaborator_deleted):
         {
             "by_user": {
                 "id": user.id,
-                "name": user.get_full_name(),
-                "department": user.groups.first().name
+                "name": user.get_full_name() or user.email,
+                "department":
+                    user.groups.first().name
+                    if user.groups.exists() else 'admin'
             },
             "deleted_user": {
                 "id": collaborator_deleted.id,
@@ -65,7 +73,8 @@ def capture_user_deleted(user, collaborator_deleted):
         }
     )
     capture_message(
-        f"User {user.first_name.capitalize()} {user.last_name.capitalize()}"
+        f"User {user.first_name.capitalize() or user.email}"
+        f" {user.last_name.capitalize()}"
         f" has deleted user {collaborator_deleted.first_name.capitalize()}"
         f" {collaborator_deleted.last_name.capitalize()}."
     )
