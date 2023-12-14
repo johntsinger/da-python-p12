@@ -1,27 +1,39 @@
+import sys
 from pathlib import Path
+from dotenv import set_key
+from sentry_sdk.utils import Dsn, BadDsn
 from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
-    help = "Set Sentry DNS"
+    help = "Set Sentry DSN"
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--set-dns",
-            action="store_true",
-            help='Set DNS for Sentry'
+            "--set-dsn",
+            action="store",
+            help="Set DSN for Sentry"
         )
 
     def handle(self, *args, **options):
-        try:
-            dns = options['set-dns']
-        except KeyError:
-            dns = input('DNS : ')
+        if options["set_dsn"]:
+            dsn = options["set_dsn"]
+        else:
+            try:
+                dsn = input("DSN : ")
+            except KeyboardInterrupt:
+                self.stderr.write("\nOperation cancelled.")
+                sys.exit(1)
 
-        file_name = Path(".env.dns")
+        try:
+            Dsn(dsn)
+        except BadDsn as err:
+            self.stderr.write(f"{err}.")
+            sys.exit(1)
+
+        file_name = Path(".env.dsn")
         if not Path.is_file(file_name):
-            with open(file_name, 'w') as file:
-                file.write(
-                    f"DNS={dns}"
-                )
-        print('DNS successfully added.')
+            with open(file_name, "w"):
+                pass
+        set_key(".env.dsn", "DSN", dsn)
+        self.stdout.write("DSN successfully added.")
