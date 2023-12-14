@@ -14,7 +14,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load environment variables
 load_dotenv(BASE_DIR / '.env')
-load_dotenv(BASE_DIR / '.env.dns')
 
 # Get secret key
 SECRET_KEY = os.environ.get('SECRET_KEY')

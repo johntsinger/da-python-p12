@@ -31,9 +31,9 @@ class Command(BaseCommand):
             self.stderr.write(f"{err}.")
             sys.exit(1)
 
-        file_name = Path(".env.dsn")
+        file_name = Path(".env")
         if not Path.is_file(file_name):
             with open(file_name, "w"):
                 pass
-        set_key(".env.dsn", "DSN", dsn)
+        set_key(file_name, "DSN", dsn)
         self.stdout.write("DSN successfully added.")
