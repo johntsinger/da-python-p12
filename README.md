@@ -104,7 +104,7 @@ Commands and sub commands:
     - add
     - change
    
-*Note : See help below to more detail.*
+*Note : See help below to get more help with each commands.*
 
 ### Help :
 
