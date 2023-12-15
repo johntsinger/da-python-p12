@@ -44,7 +44,7 @@ If you don't have Python 3, please visit : https://www.python.org/downloads/ to 
 
     pip install -r requirements.txt
 
-## Init CRM (admin):
+## Initialize CRM (admin):
 
 Go to the epicevents folder :
 
@@ -62,7 +62,9 @@ Create a superuser :
 
     python manage.py createsuperuser
 
-After that login as superuser using crm commands described below and add new collaborator
+After that login as superuser using crm commands described below and add new collaborators
+
+*Tip : First add a management collaborator and let him create other collaborators, since he has permission to create collaborators.*
 
 ## CRM usage :
 
@@ -70,15 +72,50 @@ If you are not in epicevents folder :
 
     cd epicevents
 
-#### Help :
+### Commands :
+
+Each commands must be like :
+
+    python epicevents.py COMMAND SUB_COMMAND [ARGS] [OPTIONS]
+
+Commands and sub commands:
+
+  - login
+  - collaborator
+    - view
+    - add
+    - change
+    - delete
+  - client
+    - view
+    - add
+    - change
+  - contract
+    - view
+    - add
+    - change
+  - event
+    - view
+    - add
+    - change
+   
+*Note : See help below to more detail.*
+
+### Help :
 
 All commands have a help option `--help`
 
 Global help :
   
-    py epicevents.py --help
+    python epicevents.py --help
 
+Commands help :
 
+    python epicevents.py COMMAND --help
+
+Sub commands help :
+
+    python epicevents.py COMMAND SUB_COMMAND --help
 
 ## Running Tests :
 
@@ -98,7 +135,7 @@ Get tests coverage with [Coverage](https://coverage.readthedocs.io/en/coverage-5
 
         coverage run manage.py test
 
-  Note : a cover file already exists, but you can update it with this command.
+  *Note : a cover file already exists, but you can update it with this command.*
 
   - Get report :
   
