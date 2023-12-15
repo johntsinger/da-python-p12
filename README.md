@@ -59,7 +59,7 @@ Set DSN for sentry (optional) :
 
     python manage.py sentry
 
-or directly with option --set-dsn :
+or directly with option `--set-dsn` :
 
     python manage.py sentry --set-dsn [DSN_ADDRESS]
 
