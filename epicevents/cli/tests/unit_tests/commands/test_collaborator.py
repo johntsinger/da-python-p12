@@ -221,6 +221,17 @@ class TestChange(BaseTestCase):
             result.stdout
         )
 
+    def test_change_missing_option(self):
+        result = self.runner.invoke(
+            app,
+            ['collaborator', 'change', 'user sales'],
+        )
+        self.assertIn(
+            'Collaborator has not changed.'
+            ' Specify options to change attributes.',
+            result.stdout
+        )
+
     def test_change(self):
         result = self.runner.invoke(
             app,

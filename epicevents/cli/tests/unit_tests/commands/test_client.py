@@ -209,6 +209,17 @@ class TestChange(BaseTestCase):
         )
         self.login('user@sales.com')
 
+    def test_change_missing_option(self):
+        result = self.runner.invoke(
+            app,
+            ['client', 'change', 'client one'],
+        )
+        self.assertIn(
+            'Client has not changed.'
+            ' Specify options to change attributes.',
+            result.stdout
+        )
+
     def test_change(self):
         result = self.runner.invoke(
             app,
