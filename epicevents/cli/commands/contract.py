@@ -127,7 +127,7 @@ def add(
 ):
     """
     Create a new contract.
-    Options are prompted if omitted.
+    Required options are prompted if omitted.
     """
     user = get_user()
     if not user:
@@ -256,6 +256,11 @@ def change(
         # sentry capture contract signed
         if fields_to_change.get('signed') is True:
             capture_contract_signed(contract)
+    else:
+        console.print(
+            '[orange3]Contract has not changed.'
+            ' Specify options to change attributes.'
+        )
 
     table = create_table(contract)
     console.print(table)

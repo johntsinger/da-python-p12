@@ -76,7 +76,7 @@ def add(
 ):
     """
     Create a new client.
-    Options are prompted if omitted.
+    Required options are prompted if omitted.
     """
     user = get_user()
     if not user:
@@ -211,6 +211,11 @@ def change(
             setattr(client, key, value)
         client.save()
         console.print('[green]Client successfully updated.')
+    else:
+        console.print(
+            '[orange3]Client has not changed.'
+            ' Specify options to change attributes.'
+        )
 
     table = create_table(client)
     console.print(table)

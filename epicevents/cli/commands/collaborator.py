@@ -93,7 +93,7 @@ def add(
 ):
     """
     Create a new collaborator.
-    Options are prompted if omitted.
+    Required options are prompted if omitted.
     """
     user = get_user()
     if not user:
@@ -230,6 +230,11 @@ def change(
         # sentry capture user updated
         fields = list(fields_to_change.keys())
         capture_user_update(user, collaborator, fields)
+    else:
+        console.print(
+            '[orange3]Collaborator has not changed.'
+            ' Specify options to change attributes.'
+        )
 
     table = create_table(collaborator)
     console.print(table)
@@ -244,7 +249,7 @@ def delete(
         )
     ],
 ):
-    """Delete a collaborator"""
+    """Delete a collaborator. Requires confirmation before deleting."""
     user = get_user()
     if not user:
         console.print('[red]Token has expired. Please log in again.')

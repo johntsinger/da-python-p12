@@ -142,7 +142,7 @@ def add(
 ):
     """
     Create a new event.
-    Options are prompted if omitted.
+    Required options are prompted if omitted.
     """
     new_event = Event.objects.create(
         name=name,
@@ -288,6 +288,11 @@ def change(
             setattr(event, key, value)
         event.save()
         console.print('[green]Event successfully updated.')
+    else:
+        console.print(
+            '[orange3]Event has not changed.'
+            ' Specify options to change attributes.'
+        )
 
     table = create_table(event)
     console.print(table)
