@@ -22,6 +22,7 @@ or
 ### Install Python :
 
 **Requires python 3.9 or higher**
+
 If you don't have Python 3, please visit : https://www.python.org/downloads/ to download it !
 
 ### Virtual Environment :
@@ -54,9 +55,13 @@ Run migrations :
 
     python manage.py migrate
 
-Set DNS for sentry (optional) :
+Set DSN for sentry (optional) :
 
     python manage.py sentry
+
+or directly with option `--set-dsn` :
+
+    python manage.py sentry --set-dsn [DSN_ADDRESS]
 
 Create a superuser :
 
@@ -99,7 +104,7 @@ Commands and sub commands:
     - add
     - change
    
-*Note : See help below to more detail.*
+*Note : See help below to get more help with each commands.*
 
 ### Help :
 
