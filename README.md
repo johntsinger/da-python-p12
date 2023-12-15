@@ -22,6 +22,7 @@ or
 ### Install Python :
 
 **Requires python 3.9 or higher**
+
 If you don't have Python 3, please visit : https://www.python.org/downloads/ to download it !
 
 ### Virtual Environment :
