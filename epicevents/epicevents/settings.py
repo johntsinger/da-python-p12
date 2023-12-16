@@ -47,8 +47,10 @@ AUTHENTICATION_BACKENDS = (
 )
 
 # Guardian anonymous user
+# https://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
 ANONYMOUS_USER_NAME = None
 
+# Global permissions per group
 PERMISSIONS = {
     'all': [
         'view_client',
