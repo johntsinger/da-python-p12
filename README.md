@@ -47,15 +47,15 @@ If you don't have Python 3, please visit : https://www.python.org/downloads/ to 
 
 ## Initialize CRM (admin):
 
-Go to the epicevents folder :
+##### Go to the epicevents folder :
 
     cd epicevents
 
-Run migrations :
+##### Run migrations :
 
     python manage.py migrate
 
-Set DSN for sentry (optional) :
+##### Set DSN for sentry (optional) :
 
     python manage.py sentry
 
@@ -63,7 +63,7 @@ or directly with option `--set-dsn` :
 
     python manage.py sentry --set-dsn [DSN_ADDRESS]
 
-Create a superuser :
+##### Create a superuser :
 
     python manage.py createsuperuser
 
@@ -83,7 +83,7 @@ Each commands must be like :
 
     python epicevents.py COMMAND SUB_COMMAND [ARGS] [OPTIONS]
 
-Commands and sub commands:
+#### Commands and sub commands:
 
   - login
   - collaborator
@@ -110,15 +110,15 @@ Commands and sub commands:
 
 All commands have a help option `--help`
 
-Global help :
+##### Global help :
   
     python epicevents.py --help
 
-Commands help :
+##### Commands help :
 
     python epicevents.py COMMAND --help
 
-Sub commands help :
+##### Sub commands help :
 
     python epicevents.py COMMAND SUB_COMMAND --help
 
