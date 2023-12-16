@@ -97,8 +97,8 @@ def view(
     else:
         queryset = Contract.objects.all()
 
-    table = create_table(queryset)
-    if table.columns:
+    if queryset:
+        table = create_table(queryset)
         console.print(table)
     else:
         console.print('[red]No contract found.')

@@ -28,8 +28,8 @@ def view():
     View list of all collaborators.
     """
     queryset = User.objects.all().exclude(is_superuser=True)
-    table = create_table(queryset)
-    if table.columns:
+    if queryset:
+        table = create_table(queryset)
         console.print(table)
     else:
         console.print("[red]No user found.")
