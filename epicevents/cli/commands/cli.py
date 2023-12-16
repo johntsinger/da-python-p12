@@ -19,23 +19,23 @@ app.add_typer(
     collaborator.app,
     name='collaborator',
     callback=permissions_callback,
-    help="Access collaborator commands."
+    help="Collaborator commands."
 )
 app.add_typer(
     client.app,
     name='client',
     callback=permissions_callback,
-    help="Access client commands."
+    help="Client commands."
 )
 app.add_typer(
     contract.app,
     name='contract',
     callback=permissions_callback,
-    help="Access contract commands."
+    help="Contract commands."
 )
 app.add_typer(
     event.app,
     name='event',
     callback=permissions_callback,
-    help="Access event commands."
+    help="Event commands."
 )
