@@ -80,8 +80,6 @@ def create_table(queryset_or_obj):
     except AttributeError:
         obj = queryset_or_obj
         queryset = get_model(obj).objects.filter(id=obj.id)
-    if not obj:
-        return Table()
     type_obj = get_type(obj)
     table = Table(title=type_obj + 's', header_style='blue')
     table = table_add_column(table, type_obj)
