@@ -4,6 +4,8 @@
 
 CRM (Customer Relationship Management) with command-line interface using django orm as a standalone.
 
+Using jwt to authenticate users, permissions system and Sentry to track errors.
+
 ## Installation guide
 
 ### Clone repository with Git :
