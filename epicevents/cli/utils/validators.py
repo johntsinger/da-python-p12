@@ -33,20 +33,32 @@ def validate(validator_name, value, ctx):
     return value, None
 
 
-def validate_unique_email(value):
+def validate_unique_email(value, ctx):
+    email = None
+    if ctx.obj:
+        email = ctx.obj.email
     if (
-        User.objects.filter(email=value).exists()
-        or Client.objects.filter(email=value).exists()
+        email != value
+        and (
+            User.objects.filter(email=value).exists()
+            or Client.objects.filter(email=value).exists()
+        )
     ):
         raise ValidationError(
             "This email is already exists"
         )
 
 
-def validate_unique_phone(value):
+def validate_unique_phone(value, ctx):
+    phone = None
+    if ctx.obj:
+        phone = ctx.obj.phone
     if (
-        User.objects.filter(phone=value).exists()
-        or Client.objects.filter(phone=value).exists()
+        phone != value
+        and (
+            User.objects.filter(phone=value).exists()
+            or Client.objects.filter(phone=value).exists()
+        )
     ):
         raise ValidationError(
             "This phone is already exists"
@@ -198,7 +210,7 @@ def validate_email(value, ctx):
     email_validator(value)
     value = normalize_email(value)
     if ctx.info_name != 'login':
-        validate_unique_email(value)
+        validate_unique_email(value, ctx)
     return value
 
 
@@ -209,7 +221,7 @@ def validate_phone(value, ctx):
             "Enter a valid phone number"
         )
     value = normalize_phone(value)
-    validate_unique_phone(value)
+    validate_unique_phone(value, ctx)
     return value
 
 

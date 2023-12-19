@@ -8,6 +8,12 @@ from orm.models import User, Compagny, Client, Contract, Event
 from cli.utils import validators
 
 
+class Obj:
+    def __init__(self):
+        self.email = None
+        self.phone = None
+
+
 class ParentContext:
     def __init__(self):
         self.info_name = None
@@ -19,6 +25,7 @@ class Context:
         self.info_name = None
         self.user = None
         self.parent = ParentContext()
+        self.obj = Obj()
 
 
 class ContextMixin:
@@ -87,14 +94,19 @@ class TestValidateDepartment(TestCase):
         )
 
 
-class TestValidatePhone(BaseTestCase):
+class TestValidatePhone(ContextMixin, BaseTestCase):
     phone = '0610101010'
     phone_normalized = '+33610101010'
     invalid_phone = '0615022222000323'
     existing_phone = '0611111111'
 
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.ctx.obj.phone = '+33600000000'
+
     def test_phone_valid(self):
-        phone = validators.validate_phone(self.phone, ctx=None)
+        phone = validators.validate_phone(self.phone, ctx=self.ctx)
         self.assertEqual(phone, self.phone_normalized)
 
     def test_phone_invalid(self):
@@ -102,7 +114,7 @@ class TestValidatePhone(BaseTestCase):
             ValidationError,
             validators.validate_phone,
             value=self.invalid_phone,
-            ctx=None
+            ctx=self.ctx
         )
 
     def test_phone_already_exist(self):
@@ -110,7 +122,7 @@ class TestValidatePhone(BaseTestCase):
             ValidationError,
             validators.validate_phone,
             value=self.existing_phone,
-            ctx=None
+            ctx=self.ctx
         )
 
 
@@ -122,6 +134,7 @@ class TestValidateEmail(ContextMixin, BaseTestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.ctx.info_name = 'collaborator'
+        cls.ctx.obj.email = 'email@test.com'
         cls.existing_email = cls.user_sales.email
 
     def test_email_valid(self):
@@ -449,22 +462,24 @@ class TestValidateContract(ContextMixin, BaseTestCase):
         )
 
 
-class TestValidateUnique(TestCase):
-    def unique_email(self):
+class TestValidateUnique(ContextMixin, BaseTestCase):
+    def test_unique_email(self):
         self.assertRaises(
             ValidationError,
             validators.validate_unique_email,
             value=self.user_sales.email,
+            ctx=self.ctx
         )
 
-    def unique_phone(self):
+    def test_unique_phone(self):
         self.assertRaises(
             ValidationError,
             validators.validate_unique_phone,
             value=self.user_sales.phone,
+            ctx=self.ctx
         )
 
-    def unique_event_for_contract(self):
+    def test_unique_event_for_contract(self):
         Event.objects.create(
             name='event',
             start_date=datetime.now() + timedelta(days=1),
