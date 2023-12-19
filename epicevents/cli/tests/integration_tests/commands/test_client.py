@@ -78,6 +78,17 @@ class TestView(BaseTestCase):
         cls.user_sales = cls.create_user_sales()
         cls.login('user@sales.com')
 
+    @patch('cli.commands.client.get_user', return_value=None)
+    def test_view_token_expired(self, mock):
+        result = self.runner.invoke(
+            app,
+            ['client', 'view']
+        )
+        self.assertIn(
+            self.token_expired(),
+            result.stdout
+        )
+
     def test_view_no_client(self):
         result = self.runner.invoke(
             app,
@@ -98,6 +109,25 @@ class TestView(BaseTestCase):
             client.email,
             result.stdout
         )
+
+    def test_view_filter(self):
+        commands = ['-a']
+        for command in commands:
+            result = self.runner.invoke(
+                app,
+                ['client', 'view', command]
+            )
+            with self.subTest(command=command):
+                try:
+                    self.assertIn(
+                        'Clients',
+                        result.stdout
+                    )
+                except AssertionError:
+                    self.assertIn(
+                        'No client found.',
+                        result.stdout
+                    )
 
 
 class TestAdd(BaseTestCase):
