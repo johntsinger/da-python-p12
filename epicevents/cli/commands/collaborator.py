@@ -202,6 +202,7 @@ def change(
         console.print("[red]User not found.")
         raise typer.Exit()
 
+    ctx.obj = collaborator
     fields_to_change = {}
 
     for key, value in ctx.params.items():
@@ -211,8 +212,7 @@ def change(
             value = True
         if value:
             fields_to_change[key] = prompt_for(
-                message=key,
-                validator_name=key,
+                field_name=key,
                 ctx=ctx
             )
 
