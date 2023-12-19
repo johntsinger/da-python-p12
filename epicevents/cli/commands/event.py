@@ -192,7 +192,7 @@ def change(
             help="Change end date",
         )
     ] = False,
-    localisation: Annotated[
+    location: Annotated[
         bool,
         typer.Option(
             "--localisation",
@@ -212,7 +212,7 @@ def change(
         bool,
         typer.Option(
             "--contact",
-            "-u",
+            "-c",
             help="Change contact",
         )
     ] = False,
@@ -228,7 +228,7 @@ def change(
         bool,
         typer.Option(
             "--all",
-            help="Change all fields. It's same as -nselacuo",
+            help="Change all fields. It's same as -nselaco",
         )
     ] = False,
 ):
@@ -254,6 +254,7 @@ def change(
         console.print("[red]You are not allowed.")
         raise typer.Exit()
 
+    ctx.obj = event
     fields_to_change = {}
 
     for key, value in ctx.params.items():
@@ -265,15 +266,14 @@ def change(
             value = True
         if value:
             if key == 'note':
-                fields_to_change[key] = typer.prompt(key, default=None)
+                fields_to_change[key] = typer.prompt(key, default='')
             else:
                 if key == 'start_date' and not end_date:
                     ctx.end_date = event.end_date
                 elif key == 'end_date' and not start_date:
                     ctx.start_date = event.start_date
                 fields_to_change[key] = prompt_for(
-                    message=key,
-                    validator_name=key,
+                    field_name=key,
                     ctx=ctx
                 )
                 if key == 'start_date':
