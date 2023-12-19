@@ -10,14 +10,14 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--set-dsn",
+            "--dsn",
             action="store",
             help="Set DSN for Sentry"
         )
 
     def handle(self, *args, **options):
-        if options["set_dsn"]:
-            dsn = options["set_dsn"]
+        if options["dsn"]:
+            dsn = options["dsn"]
         else:
             try:
                 dsn = input("DSN : ")
