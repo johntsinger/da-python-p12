@@ -6,16 +6,16 @@ from epicevents.init_crm import generate_secret_key
 import sentry_sdk
 
 
-# Testing variable
+# Testing variable.
 TESTING = sys.argv[1:2] == ['test']
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load environment variables
+# Load environment variables.
 load_dotenv(BASE_DIR / '.env')
 
-# Get secret key
+# Get secret key.
 # If not secret key gernerate it. Called at the first use of manage.py.
 SECRET_KEY = os.environ.get('SECRET_KEY') or generate_secret_key()
 
@@ -44,9 +44,10 @@ AUTHENTICATION_BACKENDS = (
     'guardian.backends.ObjectPermissionBackend',
 )
 
+# Custom test runner.
 TEST_RUNNER = 'epicevents.runner.MyTestRunner'
 
-# Guardian anonymous user
+# Guardian anonymous user.
 # https://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
 ANONYMOUS_USER_NAME = None
 
