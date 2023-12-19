@@ -45,6 +45,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 # Custom test runner.
+# https://docs.djangoproject.com/en/4.2/topics/testing/advanced/#using-different-testing-frameworks
 TEST_RUNNER = 'epicevents.runner.MyTestRunner'
 
 # Guardian anonymous user.
