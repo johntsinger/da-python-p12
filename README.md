@@ -59,11 +59,23 @@ If you don't have Python 3, please visit : https://www.python.org/downloads/ to 
 
 ##### Set DSN for sentry (optional) :
 
-    python manage.py sentry
+    python manage.py setsentrydsn
 
-or directly with option `--set-dsn` :
+or directly with option `--dsn` :
 
-    python manage.py sentry --set-dsn [DSN_ADDRESS]
+    python manage.py sentry --dsn DSN_ADDRESS
+
+##### Set secret key (optional) :
+
+*Note : A secret key is automatically generated the first time a command using manage.py is run.* </br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*You can find it in .env file.* </br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Changing the secret key invalidates the JWT authentication token, after which the user must log in again.*
+
+    python manage.py setsecretkey
+
+or directly with option `--key` :
+
+    python manage.py setsecretkey --key SECRET_KEY
 
 ##### Create a superuser :
 
@@ -134,7 +146,7 @@ or more faster
 
 #### Coverage :
 
-Coverage : 98%
+Coverage : 100%
 
 Get tests coverage with [Coverage](https://coverage.readthedocs.io/en/coverage-5.1/) :
 
