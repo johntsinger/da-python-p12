@@ -17,11 +17,35 @@ app = typer.Typer()
 
 
 @app.command()
-def view():
+def view(
+    ctx: typer.Context,
+    assigned: Annotated[
+        bool,
+        typer.Option(
+            "--assigned",
+            "-a",
+            help="Filter client assigned to me",
+        )
+    ] = False,
+):
     """
     View list of all clients.
     """
-    queryset = Client.objects.all()
+    user = get_user()
+    if not user:
+        console.print('[red]Token has expired. Please log in again.')
+        raise typer.Exit()
+
+    querydict = {}
+    for key, value in ctx.params.items():
+        if value:
+            if key == 'assigned':
+                querydict['contact'] = user
+    if querydict:
+        queryset = Client.objects.filter(**querydict)
+    else:
+        queryset = Client.objects.all()
+
     if queryset:
         table = create_table(queryset)
         console.print(table)
