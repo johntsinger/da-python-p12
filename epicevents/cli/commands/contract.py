@@ -224,6 +224,7 @@ def change(
         console.print("[red]You are not allowed.")
         raise typer.Exit()
 
+    ctx.obj = contract
     fields_to_change = {}
 
     for key, value in ctx.params.items():
@@ -235,11 +236,11 @@ def change(
             fields_to_change[key] = typer.confirm('Contract signed ?')
         elif value:
             fields_to_change[key] = prompt_for(
-                message=key,
-                validator_name=key,
+                field_name=key,
                 ctx=ctx
             )
 
+    contract_signed = contract.signed
     if fields_to_change:
         for key, value in fields_to_change.items():
             if key == 'client':
@@ -254,7 +255,7 @@ def change(
         console.print('[green]Contract successfully updated.')
 
         # sentry capture contract signed
-        if fields_to_change.get('signed') is True:
+        if fields_to_change.get('signed') is True and not contract_signed:
             capture_contract_signed(contract)
     else:
         console.print(
