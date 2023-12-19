@@ -16,11 +16,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
 
 # Get secret key
-SECRET_KEY = os.environ.get('SECRET_KEY')
-
-# If not secret key gernerate it
-if not SECRET_KEY:
-    generate_secret_key(BASE_DIR)
+# If not secret key gernerate it. Called at the first use of manage.py.
+SECRET_KEY = os.environ.get('SECRET_KEY') or generate_secret_key()
 
 DATABASES = {
     'default': {
@@ -45,6 +42,8 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'guardian.backends.ObjectPermissionBackend',
 )
+
+TEST_RUNNER = 'epicevents.runner.MyTestRunner'
 
 # Guardian anonymous user
 # https://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
@@ -79,10 +78,8 @@ PERMISSIONS = {
 
 # Sentry init
 if not TESTING:
-    ignore_errors = [KeyboardInterrupt]
     sentry_sdk.init(
         dsn=os.environ.get('DSN'),
-        ignore_errors=ignore_errors,
         # Set traces_sample_rate to 1.0 to capture 100%
         # of transactions for performance monitoring.
         traces_sample_rate=1.0,
