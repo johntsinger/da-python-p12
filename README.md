@@ -146,7 +146,7 @@ or more faster
 
 #### Coverage :
 
-Coverage : 100%
+Coverage : 99%
 
 Get tests coverage with [Coverage](https://coverage.readthedocs.io/en/coverage-5.1/) :
 
