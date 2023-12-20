@@ -1,7 +1,7 @@
 import os
 from dotenv import dotenv_values
 from django.test import TestCase
-from epicevents.init_crm import generate_secret_key
+from epicevents.key import generate_secret_key
 
 
 class TestInitCRM(TestCase):

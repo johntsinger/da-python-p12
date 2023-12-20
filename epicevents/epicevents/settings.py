@@ -2,7 +2,7 @@ import sys
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-from epicevents.init_crm import generate_secret_key
+from epicevents.key import generate_secret_key
 import sentry_sdk
 
 
