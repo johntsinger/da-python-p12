@@ -47,11 +47,11 @@ If you don't have Python 3, please visit : https://www.python.org/downloads/ to 
 
     pip install -r requirements.txt
 
-## Initialize CRM (admin):
-
-##### Go to the epicevents folder :
+## Go to the epicevents folder :
 
     cd epicevents
+
+## Initialize CRM (admin):
 
 ##### Run migrations :
 
@@ -86,10 +86,6 @@ After that login as superuser using crm commands described below and add new col
 *Tip : First add a management collaborator and let him create other collaborators, since he has permission to create collaborators.*
 
 ## CRM usage :
-
-If you are not in epicevents folder :
-
-    cd epicevents
 
 ### Commands :
 
