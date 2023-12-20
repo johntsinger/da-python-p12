@@ -164,6 +164,12 @@ Get tests coverage with [Coverage](https://coverage.readthedocs.io/en/coverage-5
 
    You can find the report in the htmlcov folder by openning the index.html file.
 
+## Linting :
+
+Run flake8 :
+
+    flake8
+
 ## Contact :
 Jonathan Singer - john.t.singer@gmail.com\
 Project link : https://github.com/johntsinger/da-python-p12
