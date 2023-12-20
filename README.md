@@ -138,7 +138,7 @@ All commands have a help option `--help`
 
 ## Running Tests :
 
-⚠️ **You need to run migrations before testing**
+⚠️ **Migrations must be run before testing**
 
     python manage.py test
 
