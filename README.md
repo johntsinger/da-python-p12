@@ -138,6 +138,8 @@ All commands have a help option `--help`
 
 ## Running Tests :
 
+⚠️ **You need to run migrations before testing**
+
     python manage.py test
 
 or more faster
