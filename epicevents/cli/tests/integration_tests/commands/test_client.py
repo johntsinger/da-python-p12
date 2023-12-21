@@ -189,6 +189,8 @@ class TestChange(BaseTestCase):
         cls.client = cls.create_client(cls.user_sales)
         cls.client_2 = cls.create_client_2(cls.user_sales)
         assign_perm('change_client', cls.user_sales, cls.client)
+        # add a contract to test remove and assing object permissions
+        # to contract when client change contact
         Contract.objects.create(
             client=cls.client,
             price=100,
