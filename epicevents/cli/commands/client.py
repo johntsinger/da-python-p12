@@ -232,6 +232,10 @@ def change(
             if key == 'contact':
                 remove_perm('change_client', user, client)
                 assign_perm('change_client', value, client)
+                if client.contracts.all().exists():
+                    for contract in client.contracts.all():
+                        remove_perm('change_contract', user, contract)
+                        assign_perm('change_contract', value, contract)
             setattr(client, key, value)
         client.save()
         console.print('[green]Client successfully updated.')
