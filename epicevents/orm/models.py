@@ -134,7 +134,7 @@ class Contract(models.Model):
     client = models.ForeignKey(
         to=Client,
         on_delete=models.PROTECT,
-        related_name='client'
+        related_name='contracts'
     )
     price = models.FloatField()
     balance = models.FloatField()
