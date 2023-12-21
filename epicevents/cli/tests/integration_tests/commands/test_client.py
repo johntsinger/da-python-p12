@@ -5,7 +5,7 @@ from django.contrib.auth.models import Group
 from typer.testing import CliRunner
 from guardian.shortcuts import assign_perm
 from cli.commands.cli import app
-from orm.models import User, Client, Compagny
+from orm.models import User, Client, Compagny, Contract
 
 
 class BaseTestCase(TestCase):
@@ -189,6 +189,12 @@ class TestChange(BaseTestCase):
         cls.client = cls.create_client(cls.user_sales)
         cls.client_2 = cls.create_client_2(cls.user_sales)
         assign_perm('change_client', cls.user_sales, cls.client)
+        Contract.objects.create(
+            client=cls.client,
+            price=100,
+            balance=100,
+            signed=False,
+        )
         cls.login('user@sales.com')
 
     def test_change_invalid_client(self):
