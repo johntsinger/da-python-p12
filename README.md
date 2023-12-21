@@ -87,6 +87,8 @@ After that login as superuser using crm commands described below and add new col
 
 ## CRM usage :
 
+For a better display, set the window to full screen.
+
 ### Commands :
 
 Each commands must be like :
